@@ -182,8 +182,19 @@
               </div>
             </div>
           </div>
-          <div class="profile-actions">
-            <button class="btn btn-primary"><i class="bi bi-file-earmark-pdf"></i> Exportar Reporte</button>
+          <div class="profile-actions" style="gap: 1rem; display: flex;">
+            <button class="btn btn-primary" (click)="descargarPDF()">
+              <i class="bi bi-file-earmark-pdf"></i> Exportar Reporte
+            </button>
+            
+            <button class="btn" 
+                    [class.btn-accent]="!hasCompletedSurvey" 
+                    [class.btn-outline]="hasCompletedSurvey"
+                    [disabled]="hasCompletedSurvey"
+                    (click)="completeSurvey()">
+              <i class="bi" [class.bi-clipboard-check]="!hasCompletedSurvey" [class.bi-check-all]="hasCompletedSurvey"></i>
+              {{ hasCompletedSurvey ? 'Encuesta Completada' : 'Realizar Encuesta' }}
+            </button>
           </div>
         </div>
 

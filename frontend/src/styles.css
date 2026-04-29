@@ -127,6 +127,24 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent), #d97706);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-accent:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 .btn-outline {
   background: transparent;
   color: var(--text-main);
