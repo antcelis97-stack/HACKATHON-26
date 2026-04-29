@@ -48,7 +48,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   completeSurvey() {
-    if (confirm('¿Deseas enviar tus respuestas de la encuesta? Una vez enviada, no podrás realizarla de nuevo.')) {
+    if (confirm('¿Deseas enviar tus respuestas de la evaluación? Una vez enviada, no podrás realizarla de nuevo.')) {
       this.hasCompletedSurvey = true;
     }
   }
