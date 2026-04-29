@@ -1,13 +1,20 @@
 <div class="app-layout">
   <!-- Sidebar Navigation -->
   <aside class="sidebar glass-panel">
-    <div class="sidebar-header">
-      <div class="logo-box">
-        <i class="bi bi-mortarboard-fill text-gradient-primary"></i>
-      </div>
-      <div>
-        <h2 class="text-gradient">VinculaUT</h2>
-        <span class="badge badge-primary">Bolsa de Trabajo</span>
+    <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; gap: 1rem; padding-bottom: 0;">
+      <!-- Logo Principal: Para cambiarlo, reemplaza la foto en src/assets/ -->
+      <img src="assets/logo-principal.png" alt="Logo Universidad" style="max-height: 55px; width: auto; object-fit: contain; border-radius: 8px;" 
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      
+      <!-- Fallback automático por si aún no has puesto la imagen -->
+      <div style="display: none; align-items: center; gap: 1rem; width: 100%;">
+        <div class="logo-box">
+          <i class="bi bi-mortarboard-fill text-gradient-primary"></i>
+        </div>
+        <div>
+          <h2 class="text-gradient" style="margin:0; font-size: 1.5rem;">VinculaUT</h2>
+          <span class="badge badge-primary">Bolsa de Trabajo</span>
+        </div>
       </div>
     </div>
 
@@ -31,11 +38,17 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile">
-        <div class="avatar">AD</div>
-        <div class="user-info">
-          <h5>UT de la Costa</h5>
-          <span>Gestión Nacional</span>
+      <div class="user-profile" style="flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding-top: 1rem;">
+        <!-- Logo Perfil: Para cambiarlo, reemplaza la foto en src/assets/ -->
+        <img src="assets/logo-perfil.png" alt="Logo Perfil" style="width: 70px; height: 70px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             
+        <!-- Fallback automático por si aún no has puesto la imagen -->
+        <div class="avatar" style="display: none; width: 50px; height: 50px; font-size: 1.2rem;">AD</div>
+        
+        <div class="user-info" style="margin-left: 0;">
+          <h5 style="margin-bottom: 0.2rem; font-size: 1.1rem;">UT de la Costa</h5>
+          <span style="font-size: 0.85rem;">Gestión Nacional</span>
         </div>
       </div>
     </div>
