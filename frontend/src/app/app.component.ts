@@ -42,9 +42,9 @@ export class AppComponent implements AfterViewInit {
   private renderCharts() {
     if (this.currentView === 'dashboard') {
       this.initHistogramChart();
-      this.initRadarChart('radarChartDashboard');
+      this.initCompetenciesChart('radarChartDashboard');
     } else if (this.currentView === 'profile') {
-      this.initRadarChart('radarChartProfile');
+      this.initCompetenciesChart('radarChartProfile');
     } else if (this.currentView === 'analitica') {
       this.initDemandedSkillsChart();
       this.initPlacementChart();
@@ -94,51 +94,49 @@ export class AppComponent implements AfterViewInit {
     });
   }
 
-  private initRadarChart(canvasId: string) {
+  private initCompetenciesChart(canvasId: string) {
     const ctx = document.getElementById(canvasId) as HTMLCanvasElement;
     if (!ctx) return;
 
     this.chartInstances[canvasId] = new Chart(ctx, {
-      type: 'radar',
+      type: 'bar',
       data: {
         labels: ['Liderazgo', 'Lógica', 'Desarrollo Web', 'Resolución', 'Trabajo en Equipo', 'Bases de Datos'],
         datasets: [
           {
             label: 'Perfil Ideal (Referencia)',
             data: [80, 90, 85, 80, 90, 80],
-            backgroundColor: 'rgba(16, 185, 129, 0.2)',
-            borderColor: 'rgba(16, 185, 129, 1)',
-            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
-            borderWidth: 2
+            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            borderRadius: 4
           },
           {
             label: 'Perfil Real (Egresado)',
             data: [75, 85, 95, 85, 85, 75],
-            backgroundColor: 'rgba(37, 99, 235, 0.2)',
-            borderColor: 'rgba(37, 99, 235, 1)',
-            pointBackgroundColor: 'rgba(37, 99, 235, 1)',
-            borderWidth: 2
+            backgroundColor: 'rgba(37, 99, 235, 0.8)',
+            borderRadius: 4
           }
         ]
       },
       options: {
+        indexAxis: 'y', // Esto la convierte en horizontal
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          r: {
+          x: {
             suggestedMin: 0,
             suggestedMax: 100,
-            ticks: {
-              display: false
-            }
+            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+            ticks: { color: '#94a3b8' }
+          },
+          y: {
+            grid: { display: false },
+            ticks: { color: '#94a3b8' }
           }
         },
         plugins: {
           legend: {
             position: 'bottom',
-            labels: {
-              color: '#94a3b8'
-            }
+            labels: { color: '#94a3b8' }
           }
         }
       }
