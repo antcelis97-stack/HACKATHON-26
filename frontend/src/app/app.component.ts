@@ -30,7 +30,21 @@ export class AppComponent implements AfterViewInit {
   isLightTheme: boolean = false;
   isSidebarOpen: boolean = false;
 
+  // Profile Management
+  profilePhotoUrl: string | null = null; // Default is null to show avatar initials
+
   constructor(private sanitizer: DomSanitizer) {}
+
+  onPhotoSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.profilePhotoUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   toggleTheme() {
     this.isLightTheme = !this.isLightTheme;

@@ -160,9 +160,14 @@
       <ng-container *ngIf="currentView === 'profile'">
         <div class="profile-header glass-panel">
           <div class="profile-main-info">
-            <div class="profile-photo">
-              <img src="https://ui-avatars.com/api/?name=Maria+Armenta&background=2563eb&color=fff&size=120"
-                alt="Foto Egresado">
+            <div class="profile-photo" (click)="photoInput.click()" style="cursor: pointer; position: relative;" title="Click para cambiar foto">
+              <img [src]="profilePhotoUrl || 'https://ui-avatars.com/api/?name=Maria+Armenta&background=2563eb&color=fff&size=120'"
+                alt="Foto Egresado" id="mainProfilePhoto">
+              <div class="photo-overlay">
+                <i class="bi bi-camera-fill"></i>
+                <span>Cambiar</span>
+              </div>
+              <input type="file" #photoInput style="display: none;" (change)="onPhotoSelected($event)" accept="image/*">
             </div>
             <div class="profile-details">
               <div class="profile-title">
