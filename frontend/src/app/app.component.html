@@ -1,6 +1,6 @@
 <div class="app-layout">
   <!-- Sidebar Navigation -->
-  <aside class="sidebar glass-panel">
+  <aside class="sidebar">
     <!-- Encabezado eliminado según solicitud del usuario -->
 
     <nav class="sidebar-nav">
@@ -21,6 +21,13 @@
         <span>Analítica y Reportes</span>
       </a>
     </nav>
+
+    <div style="padding: 1rem; margin-top: auto;">
+      <button class="btn btn-outline" (click)="toggleTheme()" style="width: 100%; justify-content: flex-start; gap: 1rem;">
+        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
+        <span>{{ isLightTheme ? 'Modo Oscuro' : 'Modo Claro' }}</span>
+      </button>
+    </div>
 
     <div class="sidebar-footer">
       <div class="user-profile" style="flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding-top: 1rem;">

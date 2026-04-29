@@ -12,7 +12,7 @@
   
   /* Default Dark Mode Palette */
   --bg-main: #020617;
-  --bg-sidebar: rgba(30, 41, 59, 0.7);
+  --bg-sidebar: #0f172a;
   --surface: rgba(30, 41, 59, 0.7);
   --surface-border: rgba(255, 255, 255, 0.1);
   --surface-hover: rgba(51, 65, 85, 0.8);
