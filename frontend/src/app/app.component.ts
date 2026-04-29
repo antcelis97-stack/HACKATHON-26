@@ -41,8 +41,6 @@ export class AppComponent implements AfterViewInit {
 
   private renderCharts() {
     if (this.currentView === 'dashboard') {
-      this.initHistogramChart();
-      this.initCompetenciesChart('radarChartDashboard');
     } else if (this.currentView === 'profile') {
       this.initCompetenciesChart('radarChartProfile');
     } else if (this.currentView === 'analitica') {
