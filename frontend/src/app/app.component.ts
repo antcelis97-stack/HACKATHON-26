@@ -47,6 +47,10 @@ export class AppComponent implements AfterViewInit {
     { id: 4, nombre: 'Soporte Técnico Especializado', ideal: [85, 75, 80, 90, 85, 70], empresa: 'Global Services' }
   ];
 
+  // Interoperability SIEst 2.0
+  isSyncingSIEst: boolean = false;
+  siestData: any = null;
+
   constructor(private sanitizer: DomSanitizer) {
     // Recuperar datos de localStorage
     const savedPhoto = localStorage.getItem('profilePhotoUrl');
@@ -128,6 +132,21 @@ export class AppComponent implements AfterViewInit {
       this.calculateMatch();
       radarChart.update();
     }
+  }
+
+  syncWithSIEst() {
+    this.isSyncingSIEst = true;
+    setTimeout(() => {
+      this.siestData = {
+        promedio: 9.2,
+        estatus: 'Egresado Titulado',
+        generacion: '2021-2023',
+        cedula: 'PENDIENTE',
+        menciones: ['Excelencia Académica', 'Primer Lugar de Generación']
+      };
+      this.isSyncingSIEst = false;
+      alert('¡Sincronización con SIEst 2.0 exitosa! Los datos académicos han sido actualizados.');
+    }, 2000);
   }
 
   private calculateMatch() {

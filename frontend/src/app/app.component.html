@@ -278,6 +278,32 @@
 
             <div class="glass-panel profile-section" style="margin-top: 1.5rem;">
               <div class="card-header">
+                <h4><i class="bi bi-mortarboard"></i> Historial Académico (SIEst 2.0)</h4>
+                <button class="btn btn-outline small" (click)="syncWithSIEst()" [disabled]="isSyncingSIEst">
+                  <i class="bi" [class.bi-arrow-repeat]="!isSyncingSIEst" [class.bi-hourglass-split]="isSyncingSIEst"></i>
+                  {{ isSyncingSIEst ? 'Sincronizando...' : 'Sincronizar SIEst' }}
+                </button>
+              </div>
+              <div class="card-body">
+                <div *ngIf="!siestData" class="empty-state" style="text-align: center; padding: 1rem; color: var(--text-muted);">
+                  <p style="font-size: 0.85rem;">Haz clic para importar tus datos oficiales de la universidad.</p>
+                </div>
+                
+                <div *ngIf="siestData" class="siest-data" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                  <div class="data-item">
+                    <small style="color: var(--text-muted);">Promedio</small>
+                    <p style="font-weight: 700; color: var(--primary-500); margin: 0;">{{ siestData.promedio }}</p>
+                  </div>
+                  <div class="data-item">
+                    <small style="color: var(--text-muted);">Estatus</small>
+                    <p style="font-weight: 700; color: var(--secondary); margin: 0;">{{ siestData.estatus }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-panel profile-section" style="margin-top: 1.5rem;">
+              <div class="card-header">
                 <h4><i class="bi bi-lightning-charge"></i> Resumen de Idoneidad</h4>
               </div>
               <div class="card-body">
@@ -459,21 +485,48 @@
           </div>
         </div>
 
-        <div class="kpi-grid" style="margin-top: 1.5rem;">
-          <div class="kpi-card glass-panel">
-            <div class="kpi-icon info"><i class="bi bi-clock-history"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Tiempo Promedio Cobertura</span>
-              <h3 class="kpi-value">14 <span
-                  style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">días</span></h3>
+
+        <div class="charts-grid" style="margin-top: 1.5rem;">
+          <div class="chart-card glass-panel" style="flex: 1.5;">
+            <div class="card-header">
+              <h4><i class="bi bi-map-fill"></i> Mapa de Calor de Convenios (Zona de Influencia)</h4>
+              <span class="badge badge-success">Activo</span>
+            </div>
+            <div class="card-body" style="height: 350px; background: rgba(0,0,0,0.2); border-radius: 12px; position: relative; overflow: hidden;">
+              <!-- Simulación de mapa de calor con gradientes -->
+              <div class="heatmap-overlay" style="position: absolute; inset: 0; background: radial-gradient(circle at 30% 40%, rgba(255,0,0,0.2) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(255,165,0,0.2) 0%, transparent 30%); z-index: 1;"></div>
+              <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1500000!2d-104.8!3d21.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2smx!4v1700000000000" width="100%" height="100%" style="border:0; filter: grayscale(0.5) contrast(1.2);" allowfullscreen="" loading="lazy"></iframe>
             </div>
           </div>
-          <div class="kpi-card glass-panel">
-            <div class="kpi-icon warning"><i class="bi bi-journal-check"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Convenios por Vencer</span>
-              <h3 class="kpi-value">3 <span
-                  style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">empresas</span></h3>
+
+          <div class="chart-card glass-panel" style="flex: 1;">
+            <div class="card-header">
+              <h4><i class="bi bi-shield-check"></i> Estatus de Convenios</h4>
+            </div>
+            <div class="card-body">
+              <div class="agreement-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="agreement-item" style="padding: 0.75rem; border: 1px solid var(--surface-border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="display: block; font-size: 0.9rem;">Nestlé México</strong>
+                    <small style="color: var(--text-muted);">Vence en: 12/2026</small>
+                  </div>
+                  <span class="badge badge-success">Vigente</span>
+                </div>
+                <div class="agreement-item" style="padding: 0.75rem; border: 1px solid var(--surface-border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--accent);">
+                  <div>
+                    <strong style="display: block; font-size: 0.9rem;">Bimbo Tepic</strong>
+                    <small style="color: var(--text-muted);">Vence en: 05/2024</small>
+                  </div>
+                  <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: var(--accent);">Próximo a Vencer</span>
+                </div>
+                <div class="agreement-item" style="padding: 0.75rem; border: 1px solid var(--surface-border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="display: block; font-size: 0.9rem;">Softtek</strong>
+                    <small style="color: var(--text-muted);">Pendiente de firma</small>
+                  </div>
+                  <span class="badge badge-primary">Pendiente</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
