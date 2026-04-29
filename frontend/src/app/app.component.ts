@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import Chart from 'chart.js/auto';
 
 @Component({
@@ -19,6 +20,13 @@ export class AppComponent implements AfterViewInit {
   inegiResults: any[] = [];
   isSearchingInegi: boolean = false;
   inegiError: string = '';
+
+  // Variables for Map
+  selectedEmpresa: any = null;
+  mapaUrlSeguro: SafeResourceUrl | null = null;
+  rutaUrl: string = '';
+
+  constructor(private sanitizer: DomSanitizer) {}
 
   ngAfterViewInit() {
     // Retraso seguro para la renderización inicial
@@ -217,6 +225,25 @@ export class AppComponent implements AfterViewInit {
   }
 
   // ==========================================
+  // LÓGICA DEL MAPA Y RUTAS
+  // ==========================================
+  verMapa(empresa: any) {
+    this.selectedEmpresa = empresa;
+    
+    // Si la API de INEGI no trae lat/lon o es mock, usamos una por defecto en la zona de Tepic
+    const lat = empresa.Latitud || "21.5095";
+    const lon = empresa.Longitud || "-104.8956";
+    
+    // Construir URL del iframe de Google Maps
+    const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+    this.mapaUrlSeguro = this.sanitizer.bypassSecurityTrustResourceUrl(mapUrl);
+
+    // Construir URL de enrutamiento (destination). 
+    // Al dejar el origin vacío, Google Maps usa la ubicación actual del usuario.
+    this.rutaUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+  }
+
+  // ==========================================
   // LÓGICA DE LA API DENUE (INEGI)
   // ==========================================
   async buscarEmpresasINEGI(keyword: string) {
@@ -277,20 +304,20 @@ export class AppComponent implements AfterViewInit {
     const k = keyword.toLowerCase();
     if(k.includes('software') || k.includes('computo') || k.includes('sistema')) {
       return [
-        { Nombre: "TechSolutions del Pacífico S.A.", Clase_actividad: "Desarrollo de Software", Estrato: "11 a 50 personas", Municipio: "Tepic", Entidad: "Nayarit" },
-        { Nombre: "DevCore Consultores", Clase_actividad: "Consultoría IT", Estrato: "6 a 10 personas", Municipio: "Tepic", Entidad: "Nayarit" },
-        { Nombre: "Freelance", Clase_actividad: "Desarrollo", Estrato: "0 a 5 personas", Municipio: "Tepic", Entidad: "Nayarit" },
-        { Nombre: "Sistemas Integrales de la Costa", Clase_actividad: "Redes y Telecomunicaciones", Estrato: "31 a 50 personas", Municipio: "San Blas", Entidad: "Nayarit" }
+        { Nombre: "TechSolutions del Pacífico S.A.", Clase_actividad: "Desarrollo de Software", Estrato: "11 a 50 personas", Municipio: "Tepic", Entidad: "Nayarit", Latitud: "21.5120", Longitud: "-104.8900" },
+        { Nombre: "DevCore Consultores", Clase_actividad: "Consultoría IT", Estrato: "6 a 10 personas", Municipio: "Tepic", Entidad: "Nayarit", Latitud: "21.4980", Longitud: "-104.9010" },
+        { Nombre: "Freelance", Clase_actividad: "Desarrollo", Estrato: "0 a 5 personas", Municipio: "Tepic", Entidad: "Nayarit", Latitud: "21.5050", Longitud: "-104.8950" },
+        { Nombre: "Sistemas Integrales de la Costa", Clase_actividad: "Redes y Telecomunicaciones", Estrato: "31 a 50 personas", Municipio: "San Blas", Entidad: "Nayarit", Latitud: "21.5300", Longitud: "-105.2800" }
       ];
     } else if (k.includes('arquitectura') || k.includes('constru')) {
       return [
-        { Nombre: "Constructora del Valle", Clase_actividad: "Servicios de Arquitectura", Estrato: "51 a 100 personas", Municipio: "Bahía de Banderas", Entidad: "Nayarit" },
-        { Nombre: "Diseño Estructural Nayarita", Clase_actividad: "Supervisión de Obra", Estrato: "11 a 50 personas", Municipio: "Tepic", Entidad: "Nayarit" }
+        { Nombre: "Constructora del Valle", Clase_actividad: "Servicios de Arquitectura", Estrato: "51 a 100 personas", Municipio: "Bahía de Banderas", Entidad: "Nayarit", Latitud: "20.7850", Longitud: "-105.2850" },
+        { Nombre: "Diseño Estructural Nayarita", Clase_actividad: "Supervisión de Obra", Estrato: "11 a 50 personas", Municipio: "Tepic", Entidad: "Nayarit", Latitud: "21.5010", Longitud: "-104.8800" }
       ];
     } else {
       return [
-        { Nombre: `Empresa Comercializadora de ${keyword}`, Clase_actividad: `Comercio al por mayor y menor`, Estrato: "51 a 250 personas", Municipio: "Tepic", Entidad: "Nayarit" },
-        { Nombre: `Grupo Industrial ${keyword}`, Clase_actividad: "Servicios de manufactura y distribución", Estrato: "11 a 50 personas", Municipio: "Xalisco", Entidad: "Nayarit" }
+        { Nombre: `Empresa Comercializadora de ${keyword}`, Clase_actividad: `Comercio al por mayor y menor`, Estrato: "51 a 250 personas", Municipio: "Tepic", Entidad: "Nayarit", Latitud: "21.5090", Longitud: "-104.8960" },
+        { Nombre: `Grupo Industrial ${keyword}`, Clase_actividad: "Servicios de manufactura y distribución", Estrato: "11 a 50 personas", Municipio: "Xalisco", Entidad: "Nayarit", Latitud: "21.4500", Longitud: "-104.9000" }
       ];
     }
   }

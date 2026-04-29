@@ -308,11 +308,35 @@
                     <td>{{empresa.Clase_actividad}}</td>
                     <td><span class="badge badge-primary">{{empresa.Estrato}}</span></td>
                     <td><i class="bi bi-geo-alt"></i> {{empresa.Municipio}}, {{empresa.Entidad}}</td>
-                    <td><button class="btn btn-outline small">Añadir Convenio</button></td>
+                    <td>
+                      <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary small" (click)="verMapa(empresa)"><i class="bi bi-geo-alt-fill"></i> Mapa</button>
+                        <button class="btn btn-outline small">Convenio</button>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
+
+            <!-- Visor de Mapa y Ruta (Google Maps) -->
+            <div *ngIf="selectedEmpresa" class="glass-panel" style="margin-top: 1.5rem; border: 1px solid var(--primary-500); padding: 1.5rem; border-radius: 12px; background: rgba(37, 99, 235, 0.03);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <h4 style="margin: 0; color: var(--text-light);"><i class="bi bi-map-fill"></i> Ubicación: {{selectedEmpresa.Nombre}}</h4>
+                  <span style="font-size: 0.9rem; color: var(--text-muted);">{{selectedEmpresa.Municipio}}, {{selectedEmpresa.Entidad}}</span>
+                </div>
+                <a [href]="rutaUrl" target="_blank" class="btn btn-primary" style="background-color: #10b981; border-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                  <i class="bi bi-sign-turn-right-fill"></i> Trazar Ruta
+                </a>
+              </div>
+              
+              <!-- Iframe interactivo de Google Maps -->
+              <div style="width: 100%; height: 350px; border-radius: 8px; overflow: hidden; border: 1px solid var(--surface-border);">
+                <iframe [src]="mapaUrlSeguro" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+              </div>
+            </div>
+
           </div>
         </div>
 
