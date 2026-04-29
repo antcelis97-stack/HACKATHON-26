@@ -1,0 +1,6 @@
+Columns in adscripcion table:
+0: cve_adscripcion
+1: clave_adscripcion
+2: nombre_adscripcion
+3: estado
+4: fecha_registro
