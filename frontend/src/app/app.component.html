@@ -195,6 +195,10 @@
               <i class="bi" [class.bi-clipboard-check]="!hasCompletedSurvey" [class.bi-check-all]="hasCompletedSurvey"></i>
               {{ hasCompletedSurvey ? 'Evaluación Completada' : 'Realizar Evaluación' }}
             </button>
+
+            <button class="icon-btn" *ngIf="hasCompletedSurvey" (click)="resetEvaluation()" title="Reiniciar para Demo" style="margin-left: 0.5rem; color: var(--text-muted);">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
           </div>
         </div>
 

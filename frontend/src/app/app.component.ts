@@ -91,18 +91,29 @@ export class AppComponent implements AfterViewInit {
   private updateRadarData() {
     const radarChart = this.chartInstances['radarChartProfile'];
     if (radarChart) {
-      // Actualizar los datos del 'Perfil Real' (Dataset index 1)
-      // El orden es: Liderazgo, Lógica, Desarrollo Web, Resolución, Trabajo Equipo, Bases Datos
-      // Mapeamos los scores a estas categorías
       radarChart.data.datasets[1].data = [
-        this.surveyScores.psicometricas + 20, // Liderazgo
-        this.surveyScores.cognitivas + 10,   // Lógica
-        this.surveyScores.tecnicas + 5,      // Desarrollo Web
-        this.surveyScores.cognitivas + 15,   // Resolución
-        this.surveyScores.psicometricas + 15, // Trabajo en Equipo
-        this.surveyScores.tecnicas + 10      // Bases de Datos
+        this.surveyScores.psicometricas + 20,
+        this.surveyScores.cognitivas + 10,
+        this.surveyScores.tecnicas + 5,
+        this.surveyScores.cognitivas + 15,
+        this.surveyScores.psicometricas + 15,
+        this.surveyScores.tecnicas + 10
       ];
       radarChart.update();
+    }
+  }
+
+  resetEvaluation() {
+    if (confirm('¿Deseas reiniciar la evaluación para una nueva demostración?')) {
+      this.hasCompletedSurvey = false;
+      localStorage.removeItem('hasCompletedSurvey');
+      const radarChart = this.chartInstances['radarChartProfile'];
+      if (radarChart) {
+        // Restaurar a valores por defecto (ejemplo 65, 59, 80, ...)
+        radarChart.data.datasets[1].data = [65, 59, 80, 81, 56, 55];
+        radarChart.update();
+      }
+      alert('Sistema reiniciado para una nueva prueba.');
     }
   }
 
