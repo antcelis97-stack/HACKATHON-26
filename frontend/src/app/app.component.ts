@@ -99,38 +99,39 @@ export class AppComponent implements AfterViewInit {
     if (!ctx) return;
 
     this.chartInstances[canvasId] = new Chart(ctx, {
-      type: 'bar',
+      type: 'radar',
       data: {
         labels: ['Liderazgo', 'Lógica', 'Desarrollo Web', 'Resolución', 'Trabajo en Equipo', 'Bases de Datos'],
         datasets: [
           {
             label: 'Perfil Ideal (Referencia)',
             data: [80, 90, 85, 80, 90, 80],
-            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-            borderRadius: 4
+            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+            borderColor: 'rgba(16, 185, 129, 1)',
+            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+            borderWidth: 2
           },
           {
             label: 'Perfil Real (Egresado)',
             data: [75, 85, 95, 85, 85, 75],
-            backgroundColor: 'rgba(37, 99, 235, 0.8)',
-            borderRadius: 4
+            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+            borderColor: 'rgba(37, 99, 235, 1)',
+            pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+            borderWidth: 2
           }
         ]
       },
       options: {
-        indexAxis: 'y', // Esto la convierte en horizontal
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          x: {
-            suggestedMin: 0,
-            suggestedMax: 100,
+          r: {
+            min: 0,
+            max: 100,
             grid: { color: 'rgba(255, 255, 255, 0.1)' },
-            ticks: { color: '#94a3b8' }
-          },
-          y: {
-            grid: { display: false },
-            ticks: { color: '#94a3b8' }
+            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+            pointLabels: { color: '#94a3b8', font: { size: 12 } },
+            ticks: { display: false }
           }
         },
         plugins: {
