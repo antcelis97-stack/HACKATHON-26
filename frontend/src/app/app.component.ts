@@ -126,23 +126,18 @@ export class AppComponent implements AfterViewInit {
         maintainAspectRatio: false,
         scales: {
           r: {
-            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-            pointLabels: {
-              color: '#94a3b8',
-              font: { family: "'Plus Jakarta Sans', sans-serif" }
-            },
-            ticks: { display: false },
-            max: 100
+            suggestedMin: 0,
+            suggestedMax: 100,
+            ticks: {
+              display: false
+            }
           }
         },
         plugins: {
           legend: {
             position: 'bottom',
             labels: {
-              color: '#94a3b8',
-              usePointStyle: true,
-              font: { family: "'Plus Jakarta Sans', sans-serif" }
+              color: '#94a3b8'
             }
           }
         }
