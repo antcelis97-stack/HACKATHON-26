@@ -22,13 +22,14 @@ export class AppComponent implements AfterViewInit {
   inegiError: string = '';
 
   // Variables for Map
-  selectedEmpresa: any = null;
+  selectedEmpresa: any = { Nombre: "Tepic, Nayarit (Vista General)", Latitud: "21.5045", Longitud: "-104.8946", Municipio: "Tepic", Entidad: "Nayarit" };
   mapaUrlSeguro: SafeResourceUrl | null = null;
   rutaUrl: string = '';
 
   constructor(private sanitizer: DomSanitizer) {}
 
   ngAfterViewInit() {
+    this.verMapa(this.selectedEmpresa); // Inicializar mapa por defecto
     // Retraso seguro para la renderización inicial
     setTimeout(() => {
       this.renderCharts();
@@ -285,7 +286,10 @@ export class AppComponent implements AfterViewInit {
         // Filtrar microempresas (0 a 5 personas) como sugiere api.md
         this.inegiResults = data.filter(empresa => empresa.Estrato !== "0 a 5 personas");
         
-        if(this.inegiResults.length === 0) {
+        if(this.inegiResults.length > 0) {
+           // Auto-seleccionar el primer resultado para que aparezca en el mapa inmediatamente
+           this.verMapa(this.inegiResults[0]);
+        } else {
            this.inegiError = "No se encontraron empresas medianas/grandes con esos criterios en el radio especificado.";
         }
       } else {
@@ -320,5 +324,15 @@ export class AppComponent implements AfterViewInit {
         { Nombre: `Grupo Industrial ${keyword}`, Clase_actividad: "Servicios de manufactura y distribución", Estrato: "11 a 50 personas", Municipio: "Xalisco", Entidad: "Nayarit", Latitud: "21.4500", Longitud: "-104.9000" }
       ];
     }
+  }
+
+  // ==========================================
+  // EXPORTACIÓN A PDF
+  // ==========================================
+  descargarPDF() {
+    // Al invocar window.print() el navegador despliega la ventana
+    // que permite al usuario directamente "Guardar como PDF".
+    // Esto asegura máxima compatibilidad y conserva la seguridad local.
+    window.print();
   }
 }

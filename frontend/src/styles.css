@@ -155,3 +155,46 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* ========================================== */
+/* ESTILOS DE IMPRESI�N (PDF EXPORT)          */
+/* ========================================== */
+@media print {
+  /* Ocultar barra lateral y botones */
+  .sidebar, .btn {
+    display: none !important;
+  }
+
+  /* Ajustar el contenedor para que no se vea cortado */
+  .app-layout {
+    display: block;
+    background: white !important;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    padding: 0;
+    width: 100%;
+    background: white !important;
+  }
+
+  /* Textos oscuros para que se lean en la hoja PDF blanca */
+  body, h2, h3, h4, h5, p, span, .kpi-label, .kpi-value {
+    color: #111 !important;
+    text-shadow: none !important;
+  }
+
+  /* Quitar los fondos transl�cidos (Glassmorphism) para impresi�n */
+  .glass-panel, .kpi-card, .chart-card {
+    background: transparent !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  /* Redimensionar las gr�ficas para que entren en 1 p�gina */
+  .chart-container {
+    height: 250px !important;
+  }
+}
+
