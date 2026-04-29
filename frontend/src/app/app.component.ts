@@ -26,7 +26,19 @@ export class AppComponent implements AfterViewInit {
   mapaUrlSeguro: SafeResourceUrl | null = null;
   rutaUrl: string = '';
 
+  // Theme Management
+  isLightTheme: boolean = false;
+
   constructor(private sanitizer: DomSanitizer) {}
+
+  toggleTheme() {
+    this.isLightTheme = !this.isLightTheme;
+    if (this.isLightTheme) {
+      document.body.parentElement?.classList.add('light-theme');
+    } else {
+      document.body.parentElement?.classList.remove('light-theme');
+    }
+  }
 
   ngAfterViewInit() {
     this.verMapa(this.selectedEmpresa); // Inicializar mapa por defecto

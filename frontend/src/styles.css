@@ -10,20 +10,35 @@
   --accent: #f59e0b; /* Amber for highlights */
   --danger: #ef4444; /* Red for alerts */
   
-  /* Dark Mode Palette */
-  --bg-dark: #0f172a;
-  --bg-darker: #020617;
-  --surface-dark: rgba(30, 41, 59, 0.7);
+  /* Default Dark Mode Palette */
+  --bg-main: #020617;
+  --bg-sidebar: rgba(30, 41, 59, 0.7);
+  --surface: rgba(30, 41, 59, 0.7);
   --surface-border: rgba(255, 255, 255, 0.1);
   --surface-hover: rgba(51, 65, 85, 0.8);
-  
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
+  --glass-blur: blur(16px);
   
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Theme (White & Black) */
+.light-theme {
+  --bg-main: #f8fafc;
+  --bg-sidebar: #ffffff;
+  --surface: #ffffff;
+  --surface-border: #e2e8f0;
+  --surface-hover: #f1f5f9;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --glass-blur: none;
+  
+  --primary-500: #000000;
+  --primary-600: #111111;
 }
 
 * {
@@ -34,14 +49,18 @@
 
 body {
   font-family: var(--font-body);
-  background-color: var(--bg-darker);
+  background-color: var(--bg-main);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+.light-theme body {
+  background-image: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -52,12 +71,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glassmorphism utility */
 .glass-panel {
-  background: var(--surface-dark);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--surface-border);
   border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   transition: var(--transition);
 }
 
@@ -105,7 +124,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Typography */
 .text-gradient {
-  background: linear-gradient(135deg, #fff, #94a3b8);
+  background: linear-gradient(135deg, var(--text-main), var(--text-muted));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
