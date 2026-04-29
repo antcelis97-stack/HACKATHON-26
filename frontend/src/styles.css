@@ -156,45 +156,76 @@ h1, h2, h3, h4, h5, h6 {
   background: #475569;
 }
 
-/* ========================================== */
-/* ESTILOS DE IMPRESI�N (PDF EXPORT)          */
-/* ========================================== */
 @media print {
-  /* Ocultar barra lateral y botones */
-  .sidebar, .btn {
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+
+  /* Ocultar elementos irrelevantes */
+  .sidebar, .btn, .topbar {
     display: none !important;
   }
 
-  /* Ajustar el contenedor para que no se vea cortado */
+  /* Ajustar la estructura principal */
   .app-layout {
-    display: block;
+    display: block !important;
     background: white !important;
   }
   
   .main-content {
-    margin-left: 0;
-    padding: 0;
-    width: 100%;
+    margin-left: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
     background: white !important;
   }
 
-  /* Textos oscuros para que se lean en la hoja PDF blanca */
-  body, h2, h3, h4, h5, p, span, .kpi-label, .kpi-value {
-    color: #111 !important;
+  /* Textos nítidos en negro */
+  body, h1, h2, h3, h4, h5, p, span, .kpi-label, .kpi-value, td, th {
+    color: #000 !important;
     text-shadow: none !important;
+    -webkit-text-fill-color: #000 !important;
   }
 
-  /* Quitar los fondos transl�cidos (Glassmorphism) para impresi�n */
+  /* Acomodo de las grillas: Convertir todo a columnas individuales para PDF */
+  .charts-grid, .kpi-grid, .profile-grid {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Tarjetas y Paneles (sin glassmorphism, formato de documento) */
   .glass-panel, .kpi-card, .chart-card {
     background: transparent !important;
-    border: 1px solid #ddd !important;
+    border: 1px solid #ccc !important;
     box-shadow: none !important;
-    break-inside: avoid;
+    border-radius: 8px !important;
+    margin-bottom: 2rem !important;
+    padding: 1.5rem !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
-  /* Redimensionar las gr�ficas para que entren en 1 p�gina */
+  /* El encabezado del reporte */
+  .profile-header {
+    text-align: center !important;
+    border-bottom: 2px solid #000 !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 2rem !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+
+  /* Ajuste de gráficas para el A4 */
   .chart-container {
-    height: 250px !important;
+    height: 350px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  canvas {
+    max-height: 100% !important;
+    max-width: 100% !important;
   }
 }
-
