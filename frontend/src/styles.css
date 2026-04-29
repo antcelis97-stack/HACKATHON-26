@@ -36,25 +36,25 @@
 
 /* Light Theme (White & Black) */
 .light-theme {
-  --bg-main: #f0f2f5;
+  --bg-main: #f8fafc;
   --bg-sidebar: #ffffff;
   --surface: #ffffff;
-  --surface-border: #cbd5e1;
+  --surface-border: #e2e8f0;
   --surface-hover: #f1f5f9;
-  --text-main: #000000;
-  --text-muted: #475569;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
   --glass-blur: none;
   
-  --nav-active-bg: #000000;
-  --nav-active-text: #ffffff;
+  --nav-active-bg: rgba(37, 99, 235, 0.1);
+  --nav-active-text: #2563eb;
   
-  --badge-primary-bg: #000000;
-  --badge-primary-text: #ffffff;
-  --badge-success-bg: #10b981;
-  --badge-success-text: #ffffff;
+  --badge-primary-bg: rgba(37, 99, 235, 0.1);
+  --badge-primary-text: #2563eb;
+  --badge-success-bg: rgba(16, 185, 129, 0.1);
+  --badge-success-text: #10b981;
   
-  --primary-500: #000000;
-  --primary-600: #000000;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
 }
 
 * {
