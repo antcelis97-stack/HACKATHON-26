@@ -43,7 +43,16 @@
 
   <!-- Main Content Area -->
   <main class="main-content">
-
+    <header class="topbar glass-panel">
+      <div class="search-bar">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Buscar vacantes, egresados o empresas...">
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline icon-btn"><i class="bi bi-bell"></i></button>
+        <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nueva Vacante</button>
+      </div>
+    </header>
 
     <!-- VIEWS CONTAINER -->
     <div class="dashboard-content">
@@ -83,30 +92,10 @@
           </div>
         </div>
 
-        <div class="charts-grid">
-          <div class="chart-card glass-panel">
-            <div class="card-header">
-              <h4><i class="bi bi-bar-chart-fill"></i> Desempeño Promedio de Egresados</h4>
-            </div>
-            <div class="card-body chart-container">
-              <canvas id="histogramChart"></canvas>
-            </div>
-          </div>
-
-          <div class="chart-card glass-panel">
-            <div class="card-header">
-              <h4><i class="bi bi-radar"></i> Radar de Competencias (Spider Chart)</h4>
-            </div>
-            <div class="card-body chart-container">
-              <canvas id="radarChartDashboard"></canvas>
-            </div>
-          </div>
-        </div>
-        
         <div class="table-section glass-panel">
           <div class="card-header">
-              <h4><i class="bi bi-person-lines-fill"></i> Candidatos Idóneos Recientes</h4>
-              <button class="btn btn-outline small">Ver todos</button>
+            <h4><i class="bi bi-person-lines-fill"></i> Candidatos Idóneos Recientes</h4>
+            <button class="btn btn-outline small">Ver todos</button>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -157,7 +146,8 @@
         <div class="profile-header glass-panel">
           <div class="profile-main-info">
             <div class="profile-photo">
-              <img src="https://ui-avatars.com/api/?name=Maria+Armenta&background=2563eb&color=fff&size=120" alt="Foto Egresado">
+              <img src="https://ui-avatars.com/api/?name=Maria+Armenta&background=2563eb&color=fff&size=120"
+                alt="Foto Egresado">
             </div>
             <div class="profile-details">
               <div class="profile-title">
@@ -190,7 +180,9 @@
                       <span class="eval-title">Pruebas Psicométricas</span>
                       <span class="eval-score">85/100</span>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 85%; background: var(--primary-500);"></div></div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 85%; background: var(--primary-500);"></div>
+                    </div>
                     <p class="eval-desc">Alto desempeño bajo presión y excelente trabajo en equipo.</p>
                   </div>
                   <div class="eval-item">
@@ -198,7 +190,9 @@
                       <span class="eval-title">Pruebas Cognitivas</span>
                       <span class="eval-score">78/100</span>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 78%; background: var(--secondary);"></div></div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 78%; background: var(--secondary);"></div>
+                    </div>
                     <p class="eval-desc">Razonamiento lógico-verbal avanzado. Agilidad mental promedio.</p>
                   </div>
                   <div class="eval-item">
@@ -206,7 +200,9 @@
                       <span class="eval-title">Pruebas Técnicas</span>
                       <span class="eval-score">95/100</span>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 95%; background: var(--accent);"></div></div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 95%; background: var(--accent);"></div>
+                    </div>
                     <p class="eval-desc">Validación de conocimientos en Desarrollo Web (Angular, Postgres).</p>
                   </div>
                   <div class="eval-item">
@@ -214,7 +210,9 @@
                       <span class="eval-title">Pruebas Proyectivas</span>
                       <span class="eval-score">88/100</span>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 88%; background: #8b5cf6;"></div></div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 88%; background: #8b5cf6;"></div>
+                    </div>
                     <p class="eval-desc">Estabilidad emocional robusta. Perfil de liderazgo identificado.</p>
                   </div>
                 </div>
@@ -223,11 +221,10 @@
           </div>
 
           <div class="profile-column right-col">
-            <div class="glass-panel profile-section">
+            <div class="chart-card glass-panel">
               <div class="card-header">
                 <h4><i class="bi bi-radar"></i> Radar de Competencias (Spider Chart)</h4>
               </div>
-              <!-- Importante: Asegurar estilos para el canvas container -->
               <div class="card-body chart-container" style="height: 350px; position: relative;">
                 <canvas id="radarChartProfile"></canvas>
               </div>
@@ -239,7 +236,9 @@
               </div>
               <div class="card-body">
                 <p class="summary-text">
-                  La candidata presenta un <strong>perfil técnico sobresaliente</strong> y fuertes habilidades interpersonales. Su resultado en las pruebas proyectivas indica un alto potencial para posiciones de liderazgo técnico.
+                  La candidata presenta un <strong>perfil técnico sobresaliente</strong> y fuertes habilidades
+                  interpersonales. Su resultado en las pruebas proyectivas indica un alto potencial para posiciones de
+                  liderazgo técnico.
                 </p>
                 <div style="margin-top: 1rem;">
                   <span class="badge badge-success">Recomendada para contratación</span>
@@ -254,94 +253,17 @@
       <!-- VIEW: SECTOR EMPRESARIAL                   -->
       <!-- ========================================== -->
       <ng-container *ngIf="currentView === 'empresas'">
-        <div class="profile-header glass-panel" style="align-items: center; margin-bottom: 1.5rem;">
+        <div class="profile-header glass-panel" style="align-items: center;">
           <div>
             <h2 class="text-gradient">Sector Empresarial</h2>
-            <p style="color: var(--text-muted);">Gestión de Empresas con Convenio e Integración INEGI DENUE</p>
+            <p style="color: var(--text-muted);">Gestión de Empresas con Convenio y Vacantes Activas</p>
           </div>
           <button class="btn btn-primary"><i class="bi bi-building-add"></i> Registrar Empresa</button>
         </div>
 
-        <!-- Buscador API INEGI con Mapa Integrado -->
-        <div class="glass-panel profile-section" style="margin-bottom: 1.5rem;">
-          <div class="card-header">
-            <h4><i class="bi bi-search"></i> Explorador Nacional de Empresas (INEGI DENUE)</h4>
-          </div>
-          <div class="card-body" style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-            
-            <!-- Columna Izquierda: Buscador y Resultados -->
-            <div style="flex: 1; min-width: 320px;">
-              <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                <input type="text" #keywordInput (keyup.enter)="buscarEmpresasINEGI(keywordInput.value)" placeholder="Ej. software, arquitectura..." class="search-bar" style="flex:1; border-radius: 12px; background: var(--bg-darker); border: 1px solid var(--surface-border); padding: 0.75rem 1rem; color: white; width: 100%;">
-                <button class="btn btn-primary" (click)="buscarEmpresasINEGI(keywordInput.value)" [disabled]="isSearchingInegi">
-                  <i class="bi bi-search" *ngIf="!isSearchingInegi"></i>
-                  <div class="spinner-border spinner-border-sm" role="status" *ngIf="isSearchingInegi"></div>
-                  Buscar
-                </button>
-              </div>
-              
-              <div *ngIf="inegiError" style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); margin-bottom: 1rem; border-radius: 4px;">
-                <p style="color: var(--danger); margin:0;"><i class="bi bi-exclamation-triangle"></i> {{inegiError}}</p>
-              </div>
-
-              <!-- Resultados de la Búsqueda -->
-              <div class="table-responsive" *ngIf="inegiResults.length > 0" style="max-height: 380px; overflow-y: auto; border-radius: 8px;">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Empresa</th>
-                      <th>Tamaño</th>
-                      <th>Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let empresa of inegiResults" [style.background]="selectedEmpresa === empresa ? 'rgba(37, 99, 235, 0.1)' : 'transparent'">
-                      <td>
-                        <strong style="font-weight: 600;">{{empresa.Nombre}}</strong><br>
-                        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="bi bi-geo-alt"></i> {{empresa.Municipio}}, {{empresa.Entidad}}</span>
-                      </td>
-                      <td><span class="badge badge-primary">{{empresa.Estrato}}</span></td>
-                      <td>
-                        <button class="btn btn-outline small" (click)="verMapa(empresa)" [class.btn-primary]="selectedEmpresa === empresa" [class.btn-outline]="selectedEmpresa !== empresa">
-                          <i class="bi bi-geo-alt-fill"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Estado Vacío -->
-              <div *ngIf="inegiResults.length === 0 && !isSearchingInegi && !inegiError" style="text-align: center; color: var(--text-muted); padding: 2rem; border: 1px dashed var(--surface-border); border-radius: 12px; background: var(--bg-darker);">
-                <i class="bi bi-buildings" style="font-size: 2.5rem; opacity: 0.5;"></i>
-                <p style="margin-top: 1rem;">Busca un sector o palabra clave para localizar empresas en el mapa.</p>
-              </div>
-            </div>
-
-            <!-- Columna Derecha: Mapa -->
-            <div style="flex: 1; min-width: 320px; display: flex; flex-direction: column;">
-              <div class="glass-panel" style="border: 1px solid var(--primary-500); padding: 1rem; border-radius: 12px; background: rgba(37, 99, 235, 0.03); flex: 1; display: flex; flex-direction: column;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                  <div style="flex: 1; padding-right: 1rem;">
-                    <h5 style="margin: 0; color: var(--text-light); font-size: 1.1rem;"><i class="bi bi-map-fill"></i> {{selectedEmpresa?.Nombre}}</h5>
-                  </div>
-                  <a *ngIf="selectedEmpresa?.Nombre !== 'Tepic, Nayarit (Vista General)'" [href]="rutaUrl" target="_blank" class="btn btn-primary small" style="background-color: #10b981; border-color: #10b981; flex-shrink: 0;">
-                    <i class="bi bi-sign-turn-right-fill"></i> Ruta
-                  </a>
-                </div>
-                
-                <div style="width: 100%; min-height: 350px; flex: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--surface-border);">
-                  <iframe *ngIf="mapaUrlSeguro" [src]="mapaUrlSeguro" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
         <div class="table-section glass-panel">
           <div class="card-header">
-              <h4><i class="bi bi-briefcase-fill"></i> Directorio de Vacantes Locales</h4>
+            <h4><i class="bi bi-briefcase-fill"></i> Directorio de Vacantes</h4>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -391,7 +313,7 @@
             <h2 class="text-gradient">Analítica y Reportes Estratégicos</h2>
             <p style="color: var(--text-muted);">Tableros de control para la toma de decisiones institucionales</p>
           </div>
-          <button class="btn btn-outline" (click)="descargarPDF()"><i class="bi bi-download"></i> Descargar PDF</button>
+          <button class="btn btn-outline"><i class="bi bi-download"></i> Descargar PDF</button>
         </div>
 
         <div class="charts-grid">
@@ -413,20 +335,22 @@
             </div>
           </div>
         </div>
-        
+
         <div class="kpi-grid" style="margin-top: 1.5rem;">
           <div class="kpi-card glass-panel">
             <div class="kpi-icon info"><i class="bi bi-clock-history"></i></div>
             <div class="kpi-info">
               <span class="kpi-label">Tiempo Promedio Cobertura</span>
-              <h3 class="kpi-value">14 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">días</span></h3>
+              <h3 class="kpi-value">14 <span
+                  style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">días</span></h3>
             </div>
           </div>
           <div class="kpi-card glass-panel">
             <div class="kpi-icon warning"><i class="bi bi-journal-check"></i></div>
             <div class="kpi-info">
               <span class="kpi-label">Convenios por Vencer</span>
-              <h3 class="kpi-value">3 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">empresas</span></h3>
+              <h3 class="kpi-value">3 <span
+                  style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">empresas</span></h3>
             </div>
           </div>
         </div>
