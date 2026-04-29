@@ -12,18 +12,40 @@ import Chart from 'chart.js/auto';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements AfterViewInit {
-  title = 'frontend';
+  currentView: string = 'dashboard';
+  chartInstances: { [key: string]: Chart } = {};
 
   ngAfterViewInit() {
-    this.initHistogramChart();
-    this.initRadarChart();
+    this.renderCharts();
+  }
+
+  switchView(view: string) {
+    this.currentView = view;
+    
+    // Clean up existing charts
+    Object.values(this.chartInstances).forEach(chart => chart.destroy());
+    this.chartInstances = {};
+
+    // Wait for DOM to update with ngIf before initializing charts
+    setTimeout(() => {
+      this.renderCharts();
+    }, 50);
+  }
+
+  private renderCharts() {
+    if (this.currentView === 'dashboard') {
+      this.initHistogramChart();
+      this.initRadarChart('radarChartDashboard');
+    } else if (this.currentView === 'profile') {
+      this.initRadarChart('radarChartProfile');
+    }
   }
 
   private initHistogramChart() {
     const ctx = document.getElementById('histogramChart') as HTMLCanvasElement;
     if (!ctx) return;
 
-    new Chart(ctx, {
+    this.chartInstances['histogram'] = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: ['Psicométricas', 'Cognitivas', 'Técnicas', 'Proyectivas'],
@@ -72,17 +94,17 @@ export class AppComponent implements AfterViewInit {
     });
   }
 
-  private initRadarChart() {
-    const ctx = document.getElementById('radarChart') as HTMLCanvasElement;
+  private initRadarChart(canvasId: string) {
+    const ctx = document.getElementById(canvasId) as HTMLCanvasElement;
     if (!ctx) return;
 
-    new Chart(ctx, {
+    this.chartInstances[canvasId] = new Chart(ctx, {
       type: 'radar',
       data: {
         labels: ['Liderazgo', 'Lógica', 'Desarrollo Web', 'Resolución', 'Trabajo en Equipo', 'DBs'],
         datasets: [
           {
-            label: 'Perfil Ideal (Vacante)',
+            label: 'Perfil Ideal (Referencia)',
             data: [80, 90, 85, 80, 90, 80],
             backgroundColor: 'rgba(16, 185, 129, 0.2)',
             borderColor: 'rgba(16, 185, 129, 1)',
