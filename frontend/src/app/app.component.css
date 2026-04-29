@@ -10,15 +10,39 @@
   margin: 1rem;
   display: flex;
   flex-direction: column;
-  z-index: 10;
+  z-index: 100;
+  background: var(--bg-sidebar);
+  border-radius: 20px;
+  border: 1px solid var(--surface-border);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar-header {
-  padding: 1.5rem;
+.sidebar-top-actions {
+  padding: 1.5rem 1rem 0.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  border-bottom: 1px solid var(--surface-border);
+  gap: 0.5rem;
+}
+
+.btn-theme-toggle {
+  flex: 1;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--surface-border);
+  justify-content: flex-start;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+}
+
+.mobile-close-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
 }
 
 .logo-box {
@@ -68,8 +92,8 @@
 }
 
 .nav-item.active {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(37, 99, 235, 0.05));
-  color: var(--primary-100);
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
   border-left: 3px solid var(--primary-500);
 }
 
@@ -133,7 +157,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: var(--bg-darker);
+  background: var(--surface);
   padding: 0.75rem 1.5rem;
   border-radius: 20px;
   border: 1px solid var(--surface-border);
@@ -343,10 +367,7 @@
   font-size: 0.8rem;
 }
 
-/* ================================ */
-/* PERFIL EGRESADO STYLES           */
-/* ================================ */
-
+/* PERFIL EGRESADO */
 .profile-header {
   padding: 2rem;
   display: flex;
@@ -374,7 +395,27 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: var(--transition);
 }
+
+.photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0;
+  transition: var(--transition);
+  font-size: 0.8rem;
+  font-weight: 600;
+  gap: 0.25rem;
+}
+
+.profile-photo:hover .photo-overlay { opacity: 1; }
+.profile-photo:hover img { transform: scale(1.1); }
 
 .profile-title {
   display: flex;
@@ -415,10 +456,7 @@
   border: 1px solid var(--surface-border);
 }
 
-.profile-actions {
-  display: flex;
-  gap: 1rem;
-}
+.profile-actions { display: flex; gap: 1rem; }
 
 .profile-grid {
   display: grid;
@@ -433,11 +471,6 @@
   flex-direction: column;
 }
 
-.mt-4 {
-  margin-top: 1.5rem;
-}
-
-/* Evaluaciones Styles */
 .evaluation-list {
   display: flex;
   flex-direction: column;
@@ -456,15 +489,8 @@
   align-items: center;
 }
 
-.eval-title {
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.eval-score {
-  font-weight: 700;
-  color: var(--primary-100);
-}
+.eval-title { font-weight: 600; color: var(--text-main); }
+.eval-score { font-weight: 700; color: var(--primary-100); }
 
 .progress-bar {
   height: 8px;
@@ -491,17 +517,116 @@
   font-size: 0.95rem;
 }
 
-.summary-text strong {
+.summary-text strong { color: var(--text-main); }
+
+/* Responsive */
+.mobile-header {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  padding: 0.75rem 1.25rem;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0 !important;
+  margin-bottom: 1rem;
+}
+
+.mobile-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 700;
   color: var(--text-main);
 }
 
+.mobile-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 95;
+}
+
 @media (max-width: 1024px) {
-  .charts-grid, .profile-grid {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .mobile-header {
+    display: flex;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -1rem;
+    bottom: 0;
+    height: calc(100vh - 2rem);
+    transform: translateX(-110%);
+    margin: 1rem;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .mobile-close-btn {
+    display: block;
+  }
+
+  .main-content {
+    padding: 0 1rem 1rem 1rem;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .charts-grid,
+  .profile-grid {
     grid-template-columns: 1fr;
   }
-  
+
+  .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
   .profile-header {
+    padding: 1.5rem;
+  }
+
+  .profile-main-info {
     flex-direction: column;
-    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .profile-photo {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-title {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .profile-title h2 {
+    font-size: 1.5rem;
+  }
+
+  .kpi-value {
+    font-size: 1.5rem;
+  }
+
+  .sidebar {
+    width: calc(100vw - 2rem);
   }
 }

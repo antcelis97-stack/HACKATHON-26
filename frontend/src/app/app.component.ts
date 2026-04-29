@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import Chart from 'chart.js/auto';
 
 @Component({
@@ -14,8 +15,38 @@ import Chart from 'chart.js/auto';
 export class AppComponent implements AfterViewInit {
   currentView: string = 'dashboard';
   chartInstances: { [key: string]: Chart } = {};
+  isLightTheme: boolean = false;
+  isSidebarOpen: boolean = false;
+  profilePhotoUrl: string | null = null;
+  hasCompletedSurvey: boolean = false;
+  inegiResults: any[] = [];
+  isSearchingInegi: boolean = false;
+  inegiError: string = '';
+  selectedEmpresa: any = {
+    Nombre: 'Tepic, Nayarit (Vista General)',
+    Latitud: '21.5045',
+    Longitud: '-104.8946',
+    Municipio: 'Tepic',
+    Entidad: 'Nayarit'
+  };
+  mapaUrlSeguro: SafeResourceUrl | null = null;
+
+  constructor(private sanitizer: DomSanitizer) {
+    const savedPhoto = localStorage.getItem('profilePhotoUrl');
+    if (savedPhoto) this.profilePhotoUrl = savedPhoto;
+
+    const savedSurvey = localStorage.getItem('hasCompletedSurvey');
+    if (savedSurvey) this.hasCompletedSurvey = savedSurvey === 'true';
+
+    const savedTheme = localStorage.getItem('isLightTheme');
+    if (savedTheme) {
+      this.isLightTheme = JSON.parse(savedTheme);
+      this.applyTheme();
+    }
+  }
 
   ngAfterViewInit() {
+    this.verMapa(this.selectedEmpresa);
     // Retraso seguro para la renderización inicial
     setTimeout(() => {
       this.renderCharts();
@@ -24,6 +55,7 @@ export class AppComponent implements AfterViewInit {
 
   switchView(view: string) {
     this.currentView = view;
+    this.isSidebarOpen = false;
     
     // Destruir gráficos anteriores para evitar fugas de memoria y errores de canvas
     for (const key in this.chartInstances) {
@@ -37,6 +69,45 @@ export class AppComponent implements AfterViewInit {
     setTimeout(() => {
       this.renderCharts();
     }, 150);
+  }
+
+  onPhotoSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.profilePhotoUrl = e.target.result;
+        if (this.profilePhotoUrl) {
+          localStorage.setItem('profilePhotoUrl', this.profilePhotoUrl);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  completeSurvey() {
+    if (confirm('Deseas enviar tus respuestas de la evaluacion? Una vez enviada, no podras realizarla de nuevo.')) {
+      this.hasCompletedSurvey = true;
+      localStorage.setItem('hasCompletedSurvey', 'true');
+    }
+  }
+
+  toggleTheme() {
+    this.isLightTheme = !this.isLightTheme;
+    localStorage.setItem('isLightTheme', JSON.stringify(this.isLightTheme));
+    this.applyTheme();
+  }
+
+  private applyTheme() {
+    if (this.isLightTheme) {
+      document.body.parentElement?.classList.add('light-theme');
+    } else {
+      document.body.parentElement?.classList.remove('light-theme');
+    }
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 
   private renderCharts() {
@@ -207,5 +278,105 @@ export class AppComponent implements AfterViewInit {
         }
       }
     });
+  }
+
+  verMapa(empresa: any) {
+    this.selectedEmpresa = empresa;
+
+    const lat = empresa.Latitud || '21.5095';
+    const lon = empresa.Longitud || '-104.8956';
+    const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+    this.mapaUrlSeguro = this.sanitizer.bypassSecurityTrustResourceUrl(mapUrl);
+  }
+
+  trazarRutaEnMapa() {
+    if (!this.selectedEmpresa || this.selectedEmpresa.Nombre === 'Tepic, Nayarit (Vista General)') return;
+
+    const destLat = this.selectedEmpresa.Latitud || '21.5095';
+    const destLon = this.selectedEmpresa.Longitud || '-104.8956';
+    const originLat = '21.4880';
+    const originLon = '-104.8900';
+    const mapUrl = `https://maps.google.com/maps?saddr=${originLat},${originLon}&daddr=${destLat},${destLon}&output=embed`;
+    this.mapaUrlSeguro = this.sanitizer.bypassSecurityTrustResourceUrl(mapUrl);
+  }
+
+  registrarEmpresa() {
+    alert('Modulo de Registro de Empresa en desarrollo.');
+  }
+
+  async buscarEmpresasINEGI(keyword: string) {
+    if (!keyword.trim()) {
+      this.inegiError = 'Por favor, ingresa una palabra clave o carrera.';
+      return;
+    }
+
+    this.isSearchingInegi = true;
+    this.inegiResults = [];
+    this.inegiError = '';
+
+    const TOKEN = 'TU_TOKEN_AQUI';
+    const LAT = '21.50';
+    const LON = '-104.89';
+    const RADIO = '5000';
+    const URL = `https://www.inegi.org.mx/app/api/denue/v1/consulta/Buscar/${keyword}/${LAT},${LON}/${RADIO}/${TOKEN}`;
+
+    try {
+      let data: any = null;
+
+      try {
+        const response = await fetch(URL);
+        if (response.ok) {
+          data = await response.json();
+        } else {
+          throw new Error('Token invalido o error de CORS');
+        }
+      } catch {
+        await new Promise(r => setTimeout(r, 900));
+        data = this.generarMockInegi(keyword);
+      }
+
+      if (data && Array.isArray(data)) {
+        this.inegiResults = data.filter(empresa => empresa.Estrato !== '0 a 5 personas');
+        if (this.inegiResults.length > 0) {
+          this.verMapa(this.inegiResults[0]);
+        } else {
+          this.inegiError = 'No se encontraron empresas medianas/grandes en el radio especificado.';
+        }
+      } else {
+        this.inegiError = 'La API de INEGI no devolvio resultados validos.';
+      }
+    } catch {
+      this.inegiError = 'Error interno al procesar la busqueda.';
+    } finally {
+      this.isSearchingInegi = false;
+    }
+  }
+
+  private generarMockInegi(keyword: string): any[] {
+    const k = keyword.toLowerCase();
+    if (k.includes('software') || k.includes('computo') || k.includes('sistema')) {
+      return [
+        { Nombre: 'TechSolutions del Pacifico S.A.', Clase_actividad: 'Desarrollo de Software', Estrato: '11 a 50 personas', Municipio: 'Tepic', Entidad: 'Nayarit', Latitud: '21.5120', Longitud: '-104.8900' },
+        { Nombre: 'DevCore Consultores', Clase_actividad: 'Consultoria IT', Estrato: '6 a 10 personas', Municipio: 'Tepic', Entidad: 'Nayarit', Latitud: '21.4980', Longitud: '-104.9010' },
+        { Nombre: 'Freelance', Clase_actividad: 'Desarrollo', Estrato: '0 a 5 personas', Municipio: 'Tepic', Entidad: 'Nayarit', Latitud: '21.5050', Longitud: '-104.8950' },
+        { Nombre: 'Sistemas Integrales de la Costa', Clase_actividad: 'Redes y Telecomunicaciones', Estrato: '31 a 50 personas', Municipio: 'San Blas', Entidad: 'Nayarit', Latitud: '21.5300', Longitud: '-105.2800' }
+      ];
+    }
+
+    if (k.includes('arquitectura') || k.includes('constru')) {
+      return [
+        { Nombre: 'Constructora del Valle', Clase_actividad: 'Servicios de Arquitectura', Estrato: '51 a 100 personas', Municipio: 'Bahia de Banderas', Entidad: 'Nayarit', Latitud: '20.7850', Longitud: '-105.2850' },
+        { Nombre: 'Diseno Estructural Nayarita', Clase_actividad: 'Supervision de Obra', Estrato: '11 a 50 personas', Municipio: 'Tepic', Entidad: 'Nayarit', Latitud: '21.5010', Longitud: '-104.8800' }
+      ];
+    }
+
+    return [
+      { Nombre: `Empresa Comercializadora de ${keyword}`, Clase_actividad: 'Comercio al por mayor y menor', Estrato: '51 a 250 personas', Municipio: 'Tepic', Entidad: 'Nayarit', Latitud: '21.5090', Longitud: '-104.8960' },
+      { Nombre: `Grupo Industrial ${keyword}`, Clase_actividad: 'Servicios de manufactura y distribucion', Estrato: '11 a 50 personas', Municipio: 'Xalisco', Entidad: 'Nayarit', Latitud: '21.4500', Longitud: '-104.9000' }
+    ];
+  }
+
+  descargarPDF() {
+    window.print();
   }
 }

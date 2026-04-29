@@ -1,14 +1,31 @@
-<div class="app-layout">
+<div class="app-layout" [class.sidebar-open]="isSidebarOpen">
+  <header class="mobile-header glass-panel">
+    <div class="mobile-logo">
+      <img src="assets/UTClogin.jpg" alt="Logo" style="height: 32px; border-radius: 4px;">
+      <span>VinculaUT</span>
+    </div>
+    <div class="mobile-actions">
+      <button class="icon-btn" (click)="toggleTheme()">
+        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
+      </button>
+      <button class="icon-btn" (click)="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
   <!-- Sidebar Navigation -->
-  <aside class="sidebar glass-panel">
-    <div class="sidebar-header">
-      <div class="logo-box">
-        <i class="bi bi-mortarboard-fill text-gradient-primary"></i>
-      </div>
-      <div>
-        <h2 class="text-gradient">VinculaUT</h2>
-        <span class="badge badge-primary">Bolsa de Trabajo</span>
-      </div>
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-top-actions">
+      <button class="btn btn-theme-toggle" (click)="toggleTheme()">
+        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
+        <span>{{ isLightTheme ? 'Modo Oscuro' : 'Modo Claro' }}</span>
+      </button>
+      <button class="mobile-close-btn" (click)="toggleSidebar()">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
 
     <nav class="sidebar-nav">
@@ -31,11 +48,11 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile">
-        <div class="avatar">AD</div>
-        <div class="user-info">
-          <h5>UT de la Costa</h5>
-          <span>Gestión Nacional</span>
+      <div class="user-profile" style="flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding-top: 1rem;">
+        <img src="assets/UTClogin.jpg?v=3" alt="Logo Perfil" style="width: 70px; height: 70px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        <div class="user-info" style="margin-left: 0;">
+          <h5 style="margin-bottom: 0.2rem; font-size: 1.1rem;">UT de la Costa</h5>
+          <span style="font-size: 0.85rem;">Gestión Nacional</span>
         </div>
       </div>
     </div>
@@ -43,17 +60,6 @@
 
   <!-- Main Content Area -->
   <main class="main-content">
-    <header class="topbar glass-panel">
-      <div class="search-bar">
-        <i class="bi bi-search"></i>
-        <input type="text" placeholder="Buscar vacantes, egresados o empresas...">
-      </div>
-      <div class="topbar-actions">
-        <button class="btn btn-outline icon-btn"><i class="bi bi-bell"></i></button>
-        <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nueva Vacante</button>
-      </div>
-    </header>
-
     <!-- VIEWS CONTAINER -->
     <div class="dashboard-content">
 
@@ -145,8 +151,13 @@
       <ng-container *ngIf="currentView === 'profile'">
         <div class="profile-header glass-panel">
           <div class="profile-main-info">
-            <div class="profile-photo">
-              <img src="https://ui-avatars.com/api/?name=Maria+Armenta&background=2563eb&color=fff&size=120" alt="Foto Egresado">
+            <div class="profile-photo" (click)="photoInput.click()" style="cursor: pointer; position: relative;" title="Click para cambiar foto">
+              <img [src]="profilePhotoUrl || 'https://ui-avatars.com/api/?name=Maria+Armenta&background=2563eb&color=fff&size=120'" alt="Foto Egresado">
+              <div class="photo-overlay">
+                <i class="bi bi-camera-fill"></i>
+                <span>Cambiar</span>
+              </div>
+              <input type="file" #photoInput style="display: none;" (change)="onPhotoSelected($event)" accept="image/*">
             </div>
             <div class="profile-details">
               <div class="profile-title">
@@ -161,8 +172,18 @@
               </div>
             </div>
           </div>
-          <div class="profile-actions">
-            <button class="btn btn-primary"><i class="bi bi-file-earmark-pdf"></i> Exportar Reporte</button>
+          <div class="profile-actions" style="gap: 1rem; display: flex;">
+            <button class="btn btn-primary" (click)="descargarPDF()"><i class="bi bi-file-earmark-pdf"></i> Exportar Reporte</button>
+            <button
+              class="btn"
+              [class.btn-accent]="!hasCompletedSurvey"
+              [class.btn-outline]="hasCompletedSurvey"
+              [disabled]="hasCompletedSurvey"
+              (click)="completeSurvey()"
+            >
+              <i class="bi" [class.bi-clipboard-check]="!hasCompletedSurvey" [class.bi-check-all]="hasCompletedSurvey"></i>
+              {{ hasCompletedSurvey ? 'Evaluación Completada' : 'Realizar Evaluación' }}
+            </button>
           </div>
         </div>
 
@@ -245,9 +266,89 @@
         <div class="profile-header glass-panel" style="align-items: center;">
           <div>
             <h2 class="text-gradient">Sector Empresarial</h2>
-            <p style="color: var(--text-muted);">Gestión de Empresas con Convenio y Vacantes Activas</p>
+            <p style="color: var(--text-muted);">Gestión de Empresas con Convenio e Integración INEGI DENUE</p>
           </div>
-          <button class="btn btn-primary"><i class="bi bi-building-add"></i> Registrar Empresa</button>
+          <button class="btn btn-primary" (click)="registrarEmpresa()"><i class="bi bi-building-add"></i> Registrar Empresa</button>
+        </div>
+
+        <div class="glass-panel profile-section" style="margin-bottom: 1.5rem;">
+          <div class="card-header">
+            <h4><i class="bi bi-search"></i> Explorador Nacional de Empresas (INEGI DENUE)</h4>
+          </div>
+          <div class="card-body" style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 320px;">
+              <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
+                <input
+                  type="text"
+                  #keywordInput
+                  (keyup.enter)="buscarEmpresasINEGI(keywordInput.value)"
+                  placeholder="Ej. software, arquitectura..."
+                  style="flex: 1; border-radius: 12px; background: var(--bg-darker); border: 1px solid var(--surface-border); padding: 0.75rem 1rem; color: var(--text-main); outline: none;"
+                />
+                <button class="btn btn-primary" (click)="buscarEmpresasINEGI(keywordInput.value)" [disabled]="isSearchingInegi">
+                  <i class="bi bi-search" *ngIf="!isSearchingInegi"></i>
+                  {{ isSearchingInegi ? 'Buscando...' : 'Buscar' }}
+                </button>
+              </div>
+
+              <div *ngIf="inegiError" style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; margin-bottom: 1rem; border-radius: 4px;">
+                <p style="color: #ef4444; margin: 0;"><i class="bi bi-exclamation-triangle"></i> {{ inegiError }}</p>
+              </div>
+
+              <div class="table-responsive" *ngIf="inegiResults.length > 0" style="max-height: 360px; overflow-y: auto; border-radius: 8px;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Empresa</th>
+                      <th>Tamaño</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let empresa of inegiResults" [style.background]="selectedEmpresa === empresa ? 'rgba(37, 99, 235, 0.1)' : 'transparent'">
+                      <td>
+                        <strong style="font-weight: 600;">{{ empresa.Nombre }}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="bi bi-geo-alt"></i> {{ empresa.Municipio }}, {{ empresa.Entidad }}</span>
+                      </td>
+                      <td><span class="badge badge-primary">{{ empresa.Estrato }}</span></td>
+                      <td>
+                        <button class="btn btn-outline small" (click)="verMapa(empresa)">
+                          <i class="bi bi-geo-alt-fill"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div *ngIf="inegiResults.length === 0 && !isSearchingInegi && !inegiError" style="text-align: center; color: var(--text-muted); padding: 2rem; border: 1px dashed var(--surface-border); border-radius: 12px; background: var(--bg-darker);">
+                <i class="bi bi-buildings" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                <p style="margin-top: 1rem;">Busca un sector o palabra clave para localizar empresas en el mapa.</p>
+              </div>
+            </div>
+
+            <div style="flex: 1; min-width: 320px; display: flex; flex-direction: column;">
+              <div class="glass-panel" style="border: 1px solid var(--primary-500); padding: 1rem; border-radius: 12px; background: rgba(37, 99, 235, 0.03); flex: 1; display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.75rem;">
+                  <div style="flex: 1; padding-right: 0.5rem;">
+                    <h5 style="margin: 0; color: var(--text-light); font-size: 1.1rem;"><i class="bi bi-map-fill"></i> {{ selectedEmpresa?.Nombre }}</h5>
+                  </div>
+                  <button
+                    *ngIf="selectedEmpresa?.Nombre !== 'Tepic, Nayarit (Vista General)'"
+                    (click)="trazarRutaEnMapa()"
+                    class="btn btn-primary small"
+                    style="background-color: #10b981; border-color: #10b981; flex-shrink: 0;"
+                  >
+                    <i class="bi bi-sign-turn-right-fill"></i> Ver Ruta
+                  </button>
+                </div>
+
+                <div style="width: 100%; min-height: 350px; flex: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--surface-border);">
+                  <iframe *ngIf="mapaUrlSeguro" [src]="mapaUrlSeguro" width="100%" height="100%" style="border: 0;" loading="lazy"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="table-section glass-panel">
@@ -302,7 +403,7 @@
             <h2 class="text-gradient">Analítica y Reportes Estratégicos</h2>
             <p style="color: var(--text-muted);">Tableros de control para la toma de decisiones institucionales</p>
           </div>
-          <button class="btn btn-outline"><i class="bi bi-download"></i> Descargar PDF</button>
+          <button class="btn btn-outline" (click)="descargarPDF()"><i class="bi bi-download"></i> Descargar PDF</button>
         </div>
 
         <div class="charts-grid">

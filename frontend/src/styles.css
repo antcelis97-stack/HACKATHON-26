@@ -11,6 +11,17 @@
   --danger: #ef4444; /* Red for alerts */
   
   /* Dark Mode Palette */
+  --bg-main: #020617;
+  --bg-sidebar: #0f172a;
+  --surface: rgba(30, 41, 59, 0.7);
+  --glass-blur: blur(16px);
+  --nav-active-bg: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(37, 99, 235, 0.05));
+  --nav-active-text: var(--primary-100);
+  --badge-primary-bg: rgba(37, 99, 235, 0.1);
+  --badge-primary-text: var(--primary-100);
+  --badge-success-bg: rgba(16, 185, 129, 0.1);
+  --badge-success-text: var(--secondary);
+  --text-light: #f8fafc;
   --bg-dark: #0f172a;
   --bg-darker: #020617;
   --surface-dark: rgba(30, 41, 59, 0.7);
@@ -26,6 +37,24 @@
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.light-theme {
+  --bg-main: #f8fafc;
+  --bg-sidebar: #ffffff;
+  --surface: #ffffff;
+  --surface-border: #e2e8f0;
+  --surface-hover: #f1f5f9;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --glass-blur: none;
+  --nav-active-bg: rgba(37, 99, 235, 0.1);
+  --nav-active-text: #2563eb;
+  --badge-primary-bg: rgba(37, 99, 235, 0.1);
+  --badge-primary-text: #2563eb;
+  --badge-success-bg: rgba(16, 185, 129, 0.1);
+  --badge-success-text: #10b981;
+  --text-light: #0f172a;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -34,7 +63,7 @@
 
 body {
   font-family: var(--font-body);
-  background-color: var(--bg-darker);
+  background-color: var(--bg-main);
   background-image: 
     radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
@@ -42,6 +71,10 @@ body {
   color: var(--text-main);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+.light-theme body {
+  background-image: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -52,9 +85,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glassmorphism utility */
 .glass-panel {
-  background: var(--surface-dark);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--surface-border);
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -129,15 +162,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .badge-success {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--secondary);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-text);
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .badge-primary {
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--primary-100);
+  background: var(--badge-primary-bg);
+  color: var(--badge-primary-text);
   border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent), #d97706);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-accent:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Scrollbar styling */
