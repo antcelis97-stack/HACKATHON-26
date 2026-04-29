@@ -263,17 +263,62 @@
       <!-- VIEW: SECTOR EMPRESARIAL                   -->
       <!-- ========================================== -->
       <ng-container *ngIf="currentView === 'empresas'">
-        <div class="profile-header glass-panel" style="align-items: center;">
+        <div class="profile-header glass-panel" style="align-items: center; margin-bottom: 1.5rem;">
           <div>
             <h2 class="text-gradient">Sector Empresarial</h2>
-            <p style="color: var(--text-muted);">Gestión de Empresas con Convenio y Vacantes Activas</p>
+            <p style="color: var(--text-muted);">Gestión de Empresas con Convenio e Integración INEGI DENUE</p>
           </div>
           <button class="btn btn-primary"><i class="bi bi-building-add"></i> Registrar Empresa</button>
         </div>
 
+        <!-- Buscador API INEGI -->
+        <div class="glass-panel profile-section" style="margin-bottom: 1.5rem;">
+          <div class="card-header">
+            <h4><i class="bi bi-search"></i> Explorador Nacional de Empresas (INEGI DENUE)</h4>
+          </div>
+          <div class="card-body">
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+              <input type="text" #keywordInput (keyup.enter)="buscarEmpresasINEGI(keywordInput.value)" placeholder="Filtrar por palabra clave o carrera (ej. software, arquitectura, psicologia)..." class="search-bar" style="flex:1; border-radius: 12px; background: var(--bg-darker); border: 1px solid var(--surface-border); padding: 0.75rem 1rem; color: white; width: 100%;">
+              <button class="btn btn-primary" (click)="buscarEmpresasINEGI(keywordInput.value)" [disabled]="isSearchingInegi">
+                <i class="bi bi-search" *ngIf="!isSearchingInegi"></i>
+                <div class="spinner-border spinner-border-sm" role="status" *ngIf="isSearchingInegi"></div>
+                Buscar
+              </button>
+            </div>
+            
+            <div *ngIf="inegiError" style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); margin-bottom: 1rem; border-radius: 4px;">
+              <p style="color: var(--danger); margin:0;"><i class="bi bi-exclamation-triangle"></i> {{inegiError}}</p>
+            </div>
+
+            <!-- Resultados -->
+            <div class="table-responsive" *ngIf="inegiResults.length > 0">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nombre de Empresa</th>
+                    <th>Actividad SCIAN</th>
+                    <th>Tamaño (Estrato)</th>
+                    <th>Ubicación</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let empresa of inegiResults">
+                    <td style="font-weight: 600;">{{empresa.Nombre}}</td>
+                    <td>{{empresa.Clase_actividad}}</td>
+                    <td><span class="badge badge-primary">{{empresa.Estrato}}</span></td>
+                    <td><i class="bi bi-geo-alt"></i> {{empresa.Municipio}}, {{empresa.Entidad}}</td>
+                    <td><button class="btn btn-outline small">Añadir Convenio</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <div class="table-section glass-panel">
           <div class="card-header">
-              <h4><i class="bi bi-briefcase-fill"></i> Directorio de Vacantes</h4>
+              <h4><i class="bi bi-briefcase-fill"></i> Directorio de Vacantes Locales</h4>
           </div>
           <div class="table-responsive">
             <table class="data-table">
