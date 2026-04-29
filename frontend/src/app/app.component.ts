@@ -14,6 +14,10 @@ import Chart from 'chart.js/auto';
 })
 export class AppComponent implements AfterViewInit {
   currentView: string = 'dashboard';
+  isAuthenticated: boolean = false;
+  currentRole: 'egresado' | 'empresa' | 'admin' | null = null;
+  currentUsername: string = '';
+  loginError: string = '';
   chartInstances: { [key: string]: Chart } = {};
   isLightTheme: boolean = false;
   isSidebarOpen: boolean = false;
@@ -54,6 +58,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   switchView(view: string) {
+    if (!this.canAccessView(view)) return;
     this.currentView = view;
     this.isSidebarOpen = false;
     
@@ -69,6 +74,59 @@ export class AppComponent implements AfterViewInit {
     setTimeout(() => {
       this.renderCharts();
     }, 150);
+  }
+
+  login(username: string, password: string) {
+    const normalizedUser = username.trim().toLowerCase();
+    const users = [
+      { username: 'egresado', password: '1234', role: 'egresado' as const },
+      { username: 'empresa', password: '1234', role: 'empresa' as const },
+      { username: 'admin', password: '1234', role: 'admin' as const }
+    ];
+
+    const foundUser = users.find(u => u.username === normalizedUser && u.password === password);
+    if (!foundUser) {
+      this.loginError = 'Credenciales incorrectas. Prueba con egresado/empresa/admin y clave 1234.';
+      return;
+    }
+
+    this.isAuthenticated = true;
+    this.currentRole = foundUser.role;
+    this.currentUsername = foundUser.username;
+    this.loginError = '';
+
+    const defaultView = this.getDefaultViewByRole(foundUser.role);
+    this.switchView(defaultView);
+  }
+
+  logout() {
+    this.isAuthenticated = false;
+    this.currentRole = null;
+    this.currentUsername = '';
+    this.currentView = 'dashboard';
+    this.isSidebarOpen = false;
+    this.loginError = '';
+  }
+
+  canAccessView(view: string): boolean {
+    if (!this.currentRole) return false;
+    if (this.currentRole === 'egresado') return ['profile', 'empresas'].includes(view);
+    if (this.currentRole === 'empresa') return ['dashboard', 'empresas'].includes(view);
+    if (this.currentRole === 'admin') return ['dashboard', 'empresas', 'analitica'].includes(view);
+    return false;
+  }
+
+  getRoleLabel(): string {
+    if (this.currentRole === 'egresado') return 'Egresado';
+    if (this.currentRole === 'empresa') return 'Empresa';
+    if (this.currentRole === 'admin') return 'Administrador';
+    return '';
+  }
+
+  private getDefaultViewByRole(role: 'egresado' | 'empresa' | 'admin'): string {
+    if (role === 'egresado') return 'profile';
+    if (role === 'empresa') return 'dashboard';
+    return 'analitica';
   }
 
   onPhotoSelected(event: any) {

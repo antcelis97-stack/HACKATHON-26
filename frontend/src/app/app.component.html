@@ -1,3 +1,4 @@
+<ng-container *ngIf="isAuthenticated; else loginView">
 <div class="app-layout" [class.sidebar-open]="isSidebarOpen">
   <header class="mobile-header glass-panel">
     <div class="mobile-logo">
@@ -23,25 +24,28 @@
         <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
         <span>{{ isLightTheme ? 'Modo Oscuro' : 'Modo Claro' }}</span>
       </button>
+      <button class="btn btn-outline small" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Salir
+      </button>
       <button class="mobile-close-btn" (click)="toggleSidebar()">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
 
     <nav class="sidebar-nav">
-      <a class="nav-item" [class.active]="currentView === 'dashboard'" (click)="switchView('dashboard')">
+      <a class="nav-item" *ngIf="canAccessView('dashboard')" [class.active]="currentView === 'dashboard'" (click)="switchView('dashboard')">
         <i class="bi bi-grid-1x2-fill"></i>
         <span>Dashboard Institucional</span>
       </a>
-      <a class="nav-item" [class.active]="currentView === 'profile'" (click)="switchView('profile')">
+      <a class="nav-item" *ngIf="canAccessView('profile')" [class.active]="currentView === 'profile'" (click)="switchView('profile')">
         <i class="bi bi-person-badge"></i>
         <span>Perfil Egresado</span>
       </a>
-      <a class="nav-item" [class.active]="currentView === 'empresas'" (click)="switchView('empresas')">
+      <a class="nav-item" *ngIf="canAccessView('empresas')" [class.active]="currentView === 'empresas'" (click)="switchView('empresas')">
         <i class="bi bi-buildings"></i>
         <span>Sector Empresarial</span>
       </a>
-      <a class="nav-item" [class.active]="currentView === 'analitica'" (click)="switchView('analitica')">
+      <a class="nav-item" *ngIf="canAccessView('analitica')" [class.active]="currentView === 'analitica'" (click)="switchView('analitica')">
         <i class="bi bi-clipboard2-data"></i>
         <span>Analítica y Reportes</span>
       </a>
@@ -51,8 +55,8 @@
       <div class="user-profile" style="flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding-top: 1rem;">
         <img src="assets/UTClogin.jpg?v=3" alt="Logo Perfil" style="width: 70px; height: 70px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         <div class="user-info" style="margin-left: 0;">
-          <h5 style="margin-bottom: 0.2rem; font-size: 1.1rem;">UT de la Costa</h5>
-          <span style="font-size: 0.85rem;">Gestión Nacional</span>
+          <h5 style="margin-bottom: 0.2rem; font-size: 1.1rem;">{{ currentUsername | titlecase }}</h5>
+          <span style="font-size: 0.85rem;">{{ getRoleLabel() }}</span>
         </div>
       </div>
     </div>
@@ -447,3 +451,28 @@
     </div>
   </main>
 </div>
+</ng-container>
+
+<ng-template #loginView>
+  <div class="login-layout">
+    <div class="login-card glass-panel">
+      <img src="assets/UTClogin.jpg" alt="UT Logo" class="login-logo">
+      <h2 class="text-gradient">Acceso a VinculaUT</h2>
+      <p class="login-help">Ingresa con uno de los 3 perfiles para ver permisos por rol.</p>
+
+      <form class="login-form" (submit)="$event.preventDefault(); login(user.value, pass.value)">
+        <input #user type="text" placeholder="Usuario" autocomplete="username">
+        <input #pass type="password" placeholder="Contraseña" autocomplete="current-password">
+        <button class="btn btn-primary" type="submit">Iniciar sesión</button>
+      </form>
+
+      <div class="login-credentials">
+        <span><strong>Egresado:</strong> egresado / 1234</span>
+        <span><strong>Empresa:</strong> empresa / 1234</span>
+        <span><strong>Admin:</strong> admin / 1234</span>
+      </div>
+
+      <p class="login-error" *ngIf="loginError">{{ loginError }}</p>
+    </div>
+  </div>
+</ng-template>
