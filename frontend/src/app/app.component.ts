@@ -33,6 +33,9 @@ export class AppComponent implements AfterViewInit {
   // Profile Management
   profilePhotoUrl: string | null = null;
   hasCompletedSurvey: boolean = false;
+  isSurveyModalOpen: boolean = false;
+  surveyStep: number = 0;
+  surveyScores = { psicometricas: 50, cognitivas: 50, tecnicas: 50, proyectivas: 50 };
 
   constructor(private sanitizer: DomSanitizer) {
     // Recuperar datos de localStorage
@@ -64,9 +67,42 @@ export class AppComponent implements AfterViewInit {
   }
 
   completeSurvey() {
-    if (confirm('¿Deseas enviar tus respuestas de la evaluación? Una vez enviada, no podrás realizarla de nuevo.')) {
-      this.hasCompletedSurvey = true;
-      localStorage.setItem('hasCompletedSurvey', 'true');
+    this.isSurveyModalOpen = true;
+    this.surveyStep = 1;
+  }
+
+  submitSurveyStep(dimension: string, score: number) {
+    (this.surveyScores as any)[dimension] = score;
+    if (this.surveyStep < 4) {
+      this.surveyStep++;
+    } else {
+      this.finishSurvey();
+    }
+  }
+
+  private finishSurvey() {
+    this.hasCompletedSurvey = true;
+    this.isSurveyModalOpen = false;
+    localStorage.setItem('hasCompletedSurvey', 'true');
+    this.updateRadarData();
+    alert('¡Evaluación Finalizada! Tus resultados han sido procesados y el gráfico de competencias actualizado.');
+  }
+
+  private updateRadarData() {
+    const radarChart = this.chartInstances['radarChartProfile'];
+    if (radarChart) {
+      // Actualizar los datos del 'Perfil Real' (Dataset index 1)
+      // El orden es: Liderazgo, Lógica, Desarrollo Web, Resolución, Trabajo Equipo, Bases Datos
+      // Mapeamos los scores a estas categorías
+      radarChart.data.datasets[1].data = [
+        this.surveyScores.psicometricas + 20, // Liderazgo
+        this.surveyScores.cognitivas + 10,   // Lógica
+        this.surveyScores.tecnicas + 5,      // Desarrollo Web
+        this.surveyScores.cognitivas + 15,   // Resolución
+        this.surveyScores.psicometricas + 15, // Trabajo en Equipo
+        this.surveyScores.tecnicas + 10      // Bases de Datos
+      ];
+      radarChart.update();
     }
   }
 

@@ -466,4 +466,76 @@
 
     </div>
   </main>
+
+  <!-- MODAL DE EVALUACIÓN INTERACTIVA -->
+  <div class="modal-overlay" *ngIf="isSurveyModalOpen">
+    <div class="survey-modal glass-panel">
+      <div class="modal-header">
+        <h3><i class="bi bi-patch-check"></i> Evaluación de Idoneidad UT</h3>
+        <button class="icon-btn" (click)="isSurveyModalOpen = false"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="survey-progress">
+          <div class="progress-step" [class.active]="surveyStep >= 1">1</div>
+          <div class="progress-line"></div>
+          <div class="progress-step" [class.active]="surveyStep >= 2">2</div>
+          <div class="progress-line"></div>
+          <div class="progress-step" [class.active]="surveyStep >= 3">3</div>
+          <div class="progress-line"></div>
+          <div class="progress-step" [class.active]="surveyStep >= 4">4</div>
+        </div>
+
+        <!-- STEP 1: PSICOMÉTRICA -->
+        <div class="survey-content" *ngIf="surveyStep === 1">
+          <span class="badge badge-primary">Dimensión 1: Psicométrica</span>
+          <h4>¿Cómo actúas cuando un proyecto tiene una fecha límite muy ajustada y el equipo está bajo presión?</h4>
+          <div class="survey-options">
+            <button class="option-card" (click)="submitSurveyStep('psicometricas', 40)">
+              <i class="bi bi-alarm"></i> Me enfoco solo en mi parte para terminar rápido.
+            </button>
+            <button class="option-card" (click)="submitSurveyStep('psicometricas', 85)">
+              <i class="bi bi-people"></i> Organizo al equipo y priorizo las tareas críticas.
+            </button>
+            <button class="option-card" (click)="submitSurveyStep('psicometricas', 60)">
+              <i class="bi bi-chat-dots"></i> Pido una extensión de tiempo inmediatamente.
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: COGNITIVA -->
+        <div class="survey-content" *ngIf="surveyStep === 2">
+          <span class="badge badge-primary">Dimensión 2: Cognitiva</span>
+          <h4>Completa la secuencia lógica: 2, 6, 12, 20, 30, ...</h4>
+          <div class="survey-options">
+            <button class="option-card" (click)="submitSurveyStep('cognitivas', 30)">40</button>
+            <button class="option-card" (click)="submitSurveyStep('cognitivas', 90)">42</button>
+            <button class="option-card" (click)="submitSurveyStep('cognitivas', 40)">44</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: TÉCNICA -->
+        <div class="survey-content" *ngIf="surveyStep === 3">
+          <span class="badge badge-primary">Dimensión 3: Técnica</span>
+          <h4>En una arquitectura de software, ¿cuál es el propósito principal de un 'Middleware'?</h4>
+          <div class="survey-options">
+            <button class="option-card" (click)="submitSurveyStep('tecnicas', 85)">Interceptar y procesar peticiones entre el cliente y el servidor.</button>
+            <button class="option-card" (click)="submitSurveyStep('tecnicas', 40)">Diseñar la interfaz visual del usuario.</button>
+            <button class="option-card" (click)="submitSurveyStep('tecnicas', 50)">Almacenar datos persistentes en la memoria RAM.</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: PROYECTIVA -->
+        <div class="survey-content" *ngIf="surveyStep === 4">
+          <span class="badge badge-primary">Dimensión 4: Proyectiva</span>
+          <h4>Si pudieras elegir tu entorno de trabajo ideal para los próximos 5 años, ¿cuál sería?</h4>
+          <div class="survey-options">
+            <button class="option-card" (click)="submitSurveyStep('proyectivas', 80)">Un entorno de constante cambio con retos técnicos complejos.</button>
+            <button class="option-card" (click)="submitSurveyStep('proyectivas', 60)">Un ambiente estable con procesos ya definidos y rutinarios.</button>
+            <button class="option-card" (click)="submitSurveyStep('proyectivas', 90)">Liderando un equipo de innovación en proyectos de alto impacto.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
