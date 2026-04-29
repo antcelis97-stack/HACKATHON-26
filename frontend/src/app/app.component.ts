@@ -34,7 +34,20 @@ export class AppComponent implements AfterViewInit {
   profilePhotoUrl: string | null = null;
   hasCompletedSurvey: boolean = false;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer) {
+    // Recuperar datos de localStorage
+    const savedPhoto = localStorage.getItem('profilePhotoUrl');
+    if (savedPhoto) this.profilePhotoUrl = savedPhoto;
+
+    const savedSurvey = localStorage.getItem('hasCompletedSurvey');
+    if (savedSurvey) this.hasCompletedSurvey = savedSurvey === 'true';
+
+    const savedTheme = localStorage.getItem('isLightTheme');
+    if (savedTheme) {
+      this.isLightTheme = JSON.parse(savedTheme);
+      this.applyTheme();
+    }
+  }
 
   onPhotoSelected(event: any) {
     const file = event.target.files[0];
@@ -42,6 +55,9 @@ export class AppComponent implements AfterViewInit {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.profilePhotoUrl = e.target.result;
+        if (this.profilePhotoUrl) {
+          localStorage.setItem('profilePhotoUrl', this.profilePhotoUrl);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -50,11 +66,17 @@ export class AppComponent implements AfterViewInit {
   completeSurvey() {
     if (confirm('¿Deseas enviar tus respuestas de la evaluación? Una vez enviada, no podrás realizarla de nuevo.')) {
       this.hasCompletedSurvey = true;
+      localStorage.setItem('hasCompletedSurvey', 'true');
     }
   }
 
   toggleTheme() {
     this.isLightTheme = !this.isLightTheme;
+    localStorage.setItem('isLightTheme', JSON.stringify(this.isLightTheme));
+    this.applyTheme();
+  }
+
+  private applyTheme() {
     if (this.isLightTheme) {
       document.body.parentElement?.classList.add('light-theme');
     } else {
