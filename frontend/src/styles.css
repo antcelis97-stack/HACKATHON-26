@@ -20,6 +20,14 @@
   --text-muted: #94a3b8;
   --glass-blur: blur(16px);
   
+  --nav-active-bg: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(37, 99, 235, 0.05));
+  --nav-active-text: var(--primary-100);
+  
+  --badge-primary-bg: rgba(37, 99, 235, 0.1);
+  --badge-primary-text: var(--primary-100);
+  --badge-success-bg: rgba(16, 185, 129, 0.1);
+  --badge-success-text: var(--secondary);
+  
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
@@ -28,17 +36,25 @@
 
 /* Light Theme (White & Black) */
 .light-theme {
-  --bg-main: #f8fafc;
+  --bg-main: #f0f2f5;
   --bg-sidebar: #ffffff;
   --surface: #ffffff;
-  --surface-border: #e2e8f0;
+  --surface-border: #cbd5e1;
   --surface-hover: #f1f5f9;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
+  --text-main: #000000;
+  --text-muted: #475569;
   --glass-blur: none;
   
+  --nav-active-bg: #000000;
+  --nav-active-text: #ffffff;
+  
+  --badge-primary-bg: #000000;
+  --badge-primary-text: #ffffff;
+  --badge-success-bg: #10b981;
+  --badge-success-text: #ffffff;
+  
   --primary-500: #000000;
-  --primary-600: #111111;
+  --primary-600: #000000;
 }
 
 * {
@@ -119,7 +135,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-outline:hover {
   background: var(--surface-hover);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--surface-border);
 }
 
 /* Typography */
@@ -148,14 +164,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .badge-success {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--secondary);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-text);
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .badge-primary {
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--primary-100);
+  background: var(--badge-primary-bg);
+  color: var(--badge-primary-text);
   border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
