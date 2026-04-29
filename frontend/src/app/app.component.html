@@ -248,7 +248,7 @@
             <h2 class="text-gradient">Sector Empresarial</h2>
             <p style="color: var(--text-muted);">Gestión de Empresas con Convenio e Integración INEGI DENUE</p>
           </div>
-          <button class="btn btn-primary"><i class="bi bi-building-add"></i> Registrar Empresa</button>
+          <button class="btn btn-primary" (click)="registrarEmpresa()"><i class="bi bi-building-add"></i> Registrar Empresa</button>
         </div>
 
         <!-- Buscador API INEGI con Mapa Integrado -->
@@ -314,9 +314,9 @@
                   <div style="flex: 1; padding-right: 1rem;">
                     <h5 style="margin: 0; color: var(--text-light); font-size: 1.1rem;"><i class="bi bi-map-fill"></i> {{selectedEmpresa?.Nombre}}</h5>
                   </div>
-                  <a *ngIf="selectedEmpresa?.Nombre !== 'Tepic, Nayarit (Vista General)'" [href]="rutaUrl" target="_blank" class="btn btn-primary small" style="background-color: #10b981; border-color: #10b981; flex-shrink: 0;">
-                    <i class="bi bi-sign-turn-right-fill"></i> Ruta
-                  </a>
+                  <button *ngIf="selectedEmpresa?.Nombre !== 'Tepic, Nayarit (Vista General)'" (click)="trazarRutaEnMapa()" class="btn btn-primary small" style="background-color: #10b981; border-color: #10b981; flex-shrink: 0;">
+                    <i class="bi bi-sign-turn-right-fill"></i> Ver Ruta en Mapa
+                  </button>
                 </div>
                 
                 <div style="width: 100%; min-height: 350px; flex: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--surface-border);">

@@ -231,17 +231,31 @@ export class AppComponent implements AfterViewInit {
   verMapa(empresa: any) {
     this.selectedEmpresa = empresa;
     
-    // Si la API de INEGI no trae lat/lon o es mock, usamos una por defecto en la zona de Tepic
     const lat = empresa.Latitud || "21.5095";
     const lon = empresa.Longitud || "-104.8956";
     
-    // Construir URL del iframe de Google Maps
+    // Vista estática de un solo punto
     const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
     this.mapaUrlSeguro = this.sanitizer.bypassSecurityTrustResourceUrl(mapUrl);
+  }
 
-    // Construir URL de enrutamiento (destination). 
-    // Al dejar el origin vacío, Google Maps usa la ubicación actual del usuario.
-    this.rutaUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+  trazarRutaEnMapa() {
+    if (!this.selectedEmpresa || this.selectedEmpresa.Nombre === 'Tepic, Nayarit (Vista General)') return;
+    
+    const destLat = this.selectedEmpresa.Latitud || "21.5095";
+    const destLon = this.selectedEmpresa.Longitud || "-104.8956";
+    
+    // Simular ubicación actual (ej. Centro de Tepic o UT)
+    const originLat = "21.4880";
+    const originLon = "-104.8900";
+    
+    // Parámetros saddr (start) y daddr (destination) para embeber ruta
+    const mapUrl = `https://maps.google.com/maps?saddr=${originLat},${originLon}&daddr=${destLat},${destLon}&output=embed`;
+    this.mapaUrlSeguro = this.sanitizer.bypassSecurityTrustResourceUrl(mapUrl);
+  }
+
+  registrarEmpresa() {
+    alert("Módulo de Registro de Empresa en desarrollo.\n\nPróximamente conectaremos este formulario con la base de datos PostgreSQL.");
   }
 
   // ==========================================
