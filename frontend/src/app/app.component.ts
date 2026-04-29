@@ -37,6 +37,16 @@ export class AppComponent implements AfterViewInit {
   surveyStep: number = 0;
   surveyScores = { psicometricas: 50, cognitivas: 50, tecnicas: 50, proyectivas: 50 };
 
+  // Dynamic Matching System
+  matchPercentage: number = 75;
+  selectedVacante: any = null;
+  vacantes = [
+    { id: 1, nombre: 'Desarrollador Fullstack Jr.', ideal: [80, 95, 95, 85, 80, 90], empresa: 'Tech Nayarit' },
+    { id: 2, nombre: 'Gerente de Proyectos IT', ideal: [95, 80, 70, 95, 95, 75], empresa: 'Soluciones Costa' },
+    { id: 3, nombre: 'Analista de Bases de Datos', ideal: [70, 90, 85, 80, 75, 98], empresa: 'Data Nay' },
+    { id: 4, nombre: 'Soporte Técnico Especializado', ideal: [85, 75, 80, 90, 85, 70], empresa: 'Global Services' }
+  ];
+
   constructor(private sanitizer: DomSanitizer) {
     // Recuperar datos de localStorage
     const savedPhoto = localStorage.getItem('profilePhotoUrl');
@@ -50,6 +60,7 @@ export class AppComponent implements AfterViewInit {
       this.isLightTheme = JSON.parse(savedTheme);
       this.applyTheme();
     }
+    this.selectedVacante = this.vacantes[0]; // Por defecto la primera
   }
 
   onPhotoSelected(event: any) {
@@ -88,19 +99,51 @@ export class AppComponent implements AfterViewInit {
     alert('¡Evaluación Finalizada! Tus resultados han sido procesados y el gráfico de competencias actualizado.');
   }
 
+  onVacanteChange(event: any) {
+    const vacanteId = event.target.value;
+    this.selectedVacante = this.vacantes.find(v => v.id == vacanteId);
+    this.updateRadarData();
+  }
+
   private updateRadarData() {
     const radarChart = this.chartInstances['radarChartProfile'];
-    if (radarChart) {
-      radarChart.data.datasets[1].data = [
-        this.surveyScores.psicometricas + 20,
-        this.surveyScores.cognitivas + 10,
-        this.surveyScores.tecnicas + 5,
-        this.surveyScores.cognitivas + 15,
-        this.surveyScores.psicometricas + 15,
-        this.surveyScores.tecnicas + 10
-      ];
+    if (radarChart && this.selectedVacante) {
+      // 1. Actualizar Perfil Ideal (Dataset 0)
+      radarChart.data.datasets[0].data = this.selectedVacante.ideal;
+      radarChart.data.datasets[0].label = `Perfil Ideal: ${this.selectedVacante.nombre}`;
+
+      // 2. Actualizar Perfil Real si ya completó la encuesta
+      if (this.hasCompletedSurvey) {
+        radarChart.data.datasets[1].data = [
+          this.surveyScores.psicometricas + 20,
+          this.surveyScores.cognitivas + 10,
+          this.surveyScores.tecnicas + 5,
+          this.surveyScores.cognitivas + 15,
+          this.surveyScores.psicometricas + 15,
+          this.surveyScores.tecnicas + 10
+        ];
+      }
+
+      // 3. Calcular Match %
+      this.calculateMatch();
       radarChart.update();
     }
+  }
+
+  private calculateMatch() {
+    if (!this.selectedVacante) return;
+    const real = this.chartInstances['radarChartProfile'].data.datasets[1].data;
+    const ideal = this.selectedVacante.ideal;
+    
+    let sumDiff = 0;
+    real.forEach((val: any, i: number) => {
+      const v = typeof val === 'number' ? val : 0;
+      const diff = Math.abs(v - ideal[i]);
+      sumDiff += diff;
+    });
+    
+    // Un cálculo simple de afinidad
+    this.matchPercentage = Math.max(0, Math.min(100, Math.round(100 - (sumDiff / 6))));
   }
 
   resetEvaluation() {
