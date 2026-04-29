@@ -1,7 +1,36 @@
-<div class="app-layout">
+<div class="app-layout" [class.sidebar-open]="isSidebarOpen">
+  
+  <!-- Mobile Header (Visible only on mobile/tablet) -->
+  <header class="mobile-header glass-panel">
+    <div class="mobile-logo">
+      <img src="assets/UTClogin.jpg" alt="Logo" style="height: 32px; border-radius: 4px;">
+      <span>VinculaUT</span>
+    </div>
+    <div class="mobile-actions">
+      <button class="icon-btn" (click)="toggleTheme()">
+        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
+      </button>
+      <button class="icon-btn" (click)="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar Overlay (Visible only when sidebar is open on mobile) -->
+  <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
   <!-- Sidebar Navigation -->
-  <aside class="sidebar">
-    <!-- Encabezado eliminado según solicitud del usuario -->
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-top-actions">
+      <button class="btn btn-theme-toggle" (click)="toggleTheme()">
+        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
+        <span>{{ isLightTheme ? 'Modo Oscuro' : 'Modo Claro' }}</span>
+      </button>
+      <button class="mobile-close-btn" (click)="toggleSidebar()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
 
     <nav class="sidebar-nav">
       <a class="nav-item" [class.active]="currentView === 'dashboard'" (click)="switchView('dashboard')">
@@ -22,12 +51,7 @@
       </a>
     </nav>
 
-    <div style="padding: 1rem; margin-top: auto;">
-      <button class="btn btn-outline" (click)="toggleTheme()" style="width: 100%; justify-content: flex-start; gap: 1rem;">
-        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
-        <span>{{ isLightTheme ? 'Modo Oscuro' : 'Modo Claro' }}</span>
-      </button>
-    </div>
+    <!-- Seccion de botones movida arriba -->
 
     <div class="sidebar-footer">
       <div class="user-profile" style="flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding-top: 1rem;">

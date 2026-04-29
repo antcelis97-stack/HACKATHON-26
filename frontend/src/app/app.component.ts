@@ -28,6 +28,7 @@ export class AppComponent implements AfterViewInit {
 
   // Theme Management
   isLightTheme: boolean = false;
+  isSidebarOpen: boolean = false;
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -40,6 +41,10 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
   ngAfterViewInit() {
     this.verMapa(this.selectedEmpresa); // Inicializar mapa por defecto
     // Retraso seguro para la renderización inicial
@@ -50,6 +55,8 @@ export class AppComponent implements AfterViewInit {
 
   switchView(view: string) {
     this.currentView = view;
+    this.isSidebarOpen = false; // Close sidebar on mobile
+    
     
     // Destruir gráficos anteriores para evitar fugas de memoria y errores de canvas
     for (const key in this.chartInstances) {
