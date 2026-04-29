@@ -12,20 +12,19 @@
     </div>
 
     <nav class="sidebar-nav">
-      <!-- We can simulate tabs here since it's a prototype -->
-      <a href="#" class="nav-item active">
+      <a class="nav-item" [class.active]="currentView === 'dashboard'" (click)="switchView('dashboard')">
         <i class="bi bi-grid-1x2-fill"></i>
         <span>Dashboard Institucional</span>
       </a>
-      <a href="#" class="nav-item">
+      <a class="nav-item" [class.active]="currentView === 'profile'" (click)="switchView('profile')">
         <i class="bi bi-person-badge"></i>
         <span>Perfil Egresado</span>
       </a>
-      <a href="#" class="nav-item">
+      <a class="nav-item" [class.active]="currentView === 'empresas'" (click)="switchView('empresas')">
         <i class="bi bi-buildings"></i>
         <span>Sector Empresarial</span>
       </a>
-      <a href="#" class="nav-item">
+      <a class="nav-item" [class.active]="currentView === 'analitica'" (click)="switchView('analitica')">
         <i class="bi bi-clipboard2-data"></i>
         <span>Analítica y Reportes</span>
       </a>
@@ -55,122 +54,316 @@
       </div>
     </header>
 
+    <!-- VIEWS CONTAINER -->
     <div class="dashboard-content">
-      <!-- KPIs -->
-      <div class="kpi-grid">
-        <div class="kpi-card glass-panel">
-          <div class="kpi-icon"><i class="bi bi-briefcase"></i></div>
-          <div class="kpi-info">
-            <span class="kpi-label">Vacantes Activas</span>
-            <h3 class="kpi-value">124 <span class="trend up"><i class="bi bi-arrow-up-short"></i> 12%</span></h3>
-          </div>
-        </div>
-        <div class="kpi-card glass-panel">
-          <div class="kpi-icon success"><i class="bi bi-check-circle"></i></div>
-          <div class="kpi-info">
-            <span class="kpi-label">Inserción Laboral</span>
-            <h3 class="kpi-value">78% <span class="trend up"><i class="bi bi-arrow-up-short"></i> 5%</span></h3>
-          </div>
-        </div>
-        <div class="kpi-card glass-panel">
-          <div class="kpi-icon warning"><i class="bi bi-building"></i></div>
-          <div class="kpi-info">
-            <span class="kpi-label">Empresas (Convenio)</span>
-            <h3 class="kpi-value">45 <span class="trend neutral">-</span></h3>
-          </div>
-        </div>
-        <div class="kpi-card glass-panel">
-          <div class="kpi-icon info"><i class="bi bi-people"></i></div>
-          <div class="kpi-info">
-            <span class="kpi-label">Egresados Registrados</span>
-            <h3 class="kpi-value">850 <span class="trend up"><i class="bi bi-arrow-up-short"></i> 24%</span></h3>
-          </div>
-        </div>
-      </div>
 
-      <!-- Main Dashboards Section -->
-      <div class="charts-grid">
-        <!-- Chart 1: Histograma de Pruebas -->
-        <div class="chart-card glass-panel">
-          <div class="card-header">
-            <h4><i class="bi bi-bar-chart-fill"></i> Desempeño Promedio de Egresados</h4>
-            <button class="btn btn-outline icon-btn"><i class="bi bi-three-dots"></i></button>
+      <!-- ========================================== -->
+      <!-- VIEW: DASHBOARD INSTITUCIONAL              -->
+      <!-- ========================================== -->
+      <ng-container *ngIf="currentView === 'dashboard'">
+        <div class="kpi-grid">
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon"><i class="bi bi-briefcase"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Vacantes Activas</span>
+              <h3 class="kpi-value">124 <span class="trend up"><i class="bi bi-arrow-up-short"></i> 12%</span></h3>
+            </div>
           </div>
-          <div class="card-body chart-container">
-            <canvas id="histogramChart"></canvas>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon success"><i class="bi bi-check-circle"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Inserción Laboral</span>
+              <h3 class="kpi-value">78% <span class="trend up"><i class="bi bi-arrow-up-short"></i> 5%</span></h3>
+            </div>
+          </div>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon warning"><i class="bi bi-building"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Empresas (Convenio)</span>
+              <h3 class="kpi-value">45 <span class="trend neutral">-</span></h3>
+            </div>
+          </div>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon info"><i class="bi bi-people"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Egresados Registrados</span>
+              <h3 class="kpi-value">850 <span class="trend up"><i class="bi bi-arrow-up-short"></i> 24%</span></h3>
+            </div>
           </div>
         </div>
 
-        <!-- Chart 2: Spider Chart Competencias -->
-        <div class="chart-card glass-panel">
+        <div class="charts-grid">
+          <div class="chart-card glass-panel">
+            <div class="card-header">
+              <h4><i class="bi bi-bar-chart-fill"></i> Desempeño Promedio de Egresados</h4>
+            </div>
+            <div class="card-body chart-container">
+              <canvas id="histogramChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card glass-panel">
+            <div class="card-header">
+              <h4><i class="bi bi-radar"></i> Radar de Competencias (Spider Chart)</h4>
+            </div>
+            <div class="card-body chart-container">
+              <canvas id="radarChartDashboard"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="table-section glass-panel">
           <div class="card-header">
-            <h4><i class="bi bi-radar"></i> Radar de Competencias (Real vs Ideal)</h4>
-            <button class="btn btn-outline icon-btn"><i class="bi bi-three-dots"></i></button>
+              <h4><i class="bi bi-person-lines-fill"></i> Candidatos Idóneos Recientes</h4>
+              <button class="btn btn-outline small">Ver todos</button>
           </div>
-          <div class="card-body chart-container">
-            <canvas id="radarChart"></canvas>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Egresado</th>
+                  <th>Carrera</th>
+                  <th>Afinidad (Vacante)</th>
+                  <th>Pruebas Completadas</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="table-user">
+                      <div class="avatar small">MA</div>
+                      <span>María Armenta</span>
+                    </div>
+                  </td>
+                  <td>Ing. en Desarrollo y Gestión de Software</td>
+                  <td><span class="badge badge-success">92% Match</span></td>
+                  <td>4/4 (100%)</td>
+                  <td><button class="btn btn-outline small" (click)="switchView('profile')">Ver Perfil PDF</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="table-user">
+                      <div class="avatar small">CJ</div>
+                      <span>Carlos Jiménez</span>
+                    </div>
+                  </td>
+                  <td>Lic. en Innovación de Negocios</td>
+                  <td><span class="badge badge-primary">85% Match</span></td>
+                  <td>4/4 (100%)</td>
+                  <td><button class="btn btn-outline small" (click)="switchView('profile')">Ver Perfil PDF</button></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
-      
-      <!-- List of candidates -->
-      <div class="table-section glass-panel">
-        <div class="card-header">
-            <h4><i class="bi bi-person-lines-fill"></i> Candidatos Idóneos Recientes</h4>
-            <button class="btn btn-outline small">Ver todos</button>
+      </ng-container>
+
+      <!-- ========================================== -->
+      <!-- VIEW: PERFIL EGRESADO                      -->
+      <!-- ========================================== -->
+      <ng-container *ngIf="currentView === 'profile'">
+        <div class="profile-header glass-panel">
+          <div class="profile-main-info">
+            <div class="profile-photo">
+              <img src="https://ui-avatars.com/api/?name=Maria+Armenta&background=2563eb&color=fff&size=120" alt="Foto Egresado">
+            </div>
+            <div class="profile-details">
+              <div class="profile-title">
+                <h2>María Armenta</h2>
+                <span class="badge badge-success">Perfil Idóneo Completado</span>
+              </div>
+              <p class="career-text"><i class="bi bi-mortarboard"></i> Ing. en Desarrollo y Gestión de Software</p>
+              <div class="profile-tags">
+                <span class="tag"><i class="bi bi-geo-alt"></i> Tepic, Nayarit</span>
+                <span class="tag"><i class="bi bi-envelope"></i> m.armenta&#64;utc.edu.mx</span>
+                <span class="tag"><i class="bi bi-telephone"></i> +52 311 123 4567</span>
+              </div>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button class="btn btn-primary"><i class="bi bi-file-earmark-pdf"></i> Exportar Reporte</button>
+          </div>
         </div>
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Egresado</th>
-                <th>Carrera</th>
-                <th>Afinidad (Vacante)</th>
-                <th>Pruebas Completadas</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="table-user">
-                    <div class="avatar small">MA</div>
-                    <span>María Armenta</span>
+
+        <div class="profile-grid">
+          <div class="profile-column left-col">
+            <div class="glass-panel profile-section">
+              <div class="card-header">
+                <h4><i class="bi bi-clipboard-data"></i> Resultados de Evaluaciones</h4>
+              </div>
+              <div class="card-body">
+                <div class="evaluation-list">
+                  <div class="eval-item">
+                    <div class="eval-header">
+                      <span class="eval-title">Pruebas Psicométricas</span>
+                      <span class="eval-score">85/100</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 85%; background: var(--primary-500);"></div></div>
+                    <p class="eval-desc">Alto desempeño bajo presión y excelente trabajo en equipo.</p>
                   </div>
-                </td>
-                <td>Ing. en Desarrollo y Gestión de Software</td>
-                <td><span class="badge badge-success">92% Match</span></td>
-                <td>4/4 (100%)</td>
-                <td><button class="btn btn-outline small">Ver Perfil PDF</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-user">
-                    <div class="avatar small">CJ</div>
-                    <span>Carlos Jiménez</span>
+                  <div class="eval-item">
+                    <div class="eval-header">
+                      <span class="eval-title">Pruebas Cognitivas</span>
+                      <span class="eval-score">78/100</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 78%; background: var(--secondary);"></div></div>
+                    <p class="eval-desc">Razonamiento lógico-verbal avanzado. Agilidad mental promedio.</p>
                   </div>
-                </td>
-                <td>Lic. en Innovación de Negocios</td>
-                <td><span class="badge badge-primary">85% Match</span></td>
-                <td>4/4 (100%)</td>
-                <td><button class="btn btn-outline small">Ver Perfil PDF</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-user">
-                    <div class="avatar small">LG</div>
-                    <span>Laura Gómez</span>
+                  <div class="eval-item">
+                    <div class="eval-header">
+                      <span class="eval-title">Pruebas Técnicas</span>
+                      <span class="eval-score">95/100</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 95%; background: var(--accent);"></div></div>
+                    <p class="eval-desc">Validación de conocimientos en Desarrollo Web (Angular, Postgres).</p>
                   </div>
-                </td>
-                <td>Ing. en Logística</td>
-                <td><span class="badge badge-success">88% Match</span></td>
-                <td>4/4 (100%)</td>
-                <td><button class="btn btn-outline small">Ver Perfil PDF</button></td>
-              </tr>
-            </tbody>
-          </table>
+                  <div class="eval-item">
+                    <div class="eval-header">
+                      <span class="eval-title">Pruebas Proyectivas</span>
+                      <span class="eval-score">88/100</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 88%; background: #8b5cf6;"></div></div>
+                    <p class="eval-desc">Estabilidad emocional robusta. Perfil de liderazgo identificado.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-column right-col">
+            <div class="glass-panel profile-section">
+              <div class="card-header">
+                <h4><i class="bi bi-radar"></i> Radar de Competencias (Spider Chart)</h4>
+              </div>
+              <!-- Importante: Asegurar estilos para el canvas container -->
+              <div class="card-body chart-container" style="height: 350px; position: relative;">
+                <canvas id="radarChartProfile"></canvas>
+              </div>
+            </div>
+
+            <div class="glass-panel profile-section" style="margin-top: 1.5rem;">
+              <div class="card-header">
+                <h4><i class="bi bi-lightning-charge"></i> Resumen de Idoneidad</h4>
+              </div>
+              <div class="card-body">
+                <p class="summary-text">
+                  La candidata presenta un <strong>perfil técnico sobresaliente</strong> y fuertes habilidades interpersonales. Su resultado en las pruebas proyectivas indica un alto potencial para posiciones de liderazgo técnico.
+                </p>
+                <div style="margin-top: 1rem;">
+                  <span class="badge badge-success">Recomendada para contratación</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </ng-container>
+
+      <!-- ========================================== -->
+      <!-- VIEW: SECTOR EMPRESARIAL                   -->
+      <!-- ========================================== -->
+      <ng-container *ngIf="currentView === 'empresas'">
+        <div class="profile-header glass-panel" style="align-items: center;">
+          <div>
+            <h2 class="text-gradient">Sector Empresarial</h2>
+            <p style="color: var(--text-muted);">Gestión de Empresas con Convenio y Vacantes Activas</p>
+          </div>
+          <button class="btn btn-primary"><i class="bi bi-building-add"></i> Registrar Empresa</button>
+        </div>
+
+        <div class="table-section glass-panel">
+          <div class="card-header">
+              <h4><i class="bi bi-briefcase-fill"></i> Directorio de Vacantes</h4>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Vacante</th>
+                  <th>Empresa</th>
+                  <th>Postulantes</th>
+                  <th>Estatus</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 600;">Desarrollador Full Stack</td>
+                  <td>TechSolutions Nayarit</td>
+                  <td>12</td>
+                  <td><span class="badge badge-success">Activa</span></td>
+                  <td><button class="btn btn-outline small">Gestionar</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Analista de Datos Jr.</td>
+                  <td>AgroIndustrias de la Costa</td>
+                  <td>8</td>
+                  <td><span class="badge badge-primary">En Revisión</span></td>
+                  <td><button class="btn btn-outline small">Gestionar</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Especialista en Redes</td>
+                  <td>TelecomPacífico</td>
+                  <td>0</td>
+                  <td><span class="badge badge-success">Activa</span></td>
+                  <td><button class="btn btn-outline small">Gestionar</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ========================================== -->
+      <!-- VIEW: ANALITICA Y REPORTES                 -->
+      <!-- ========================================== -->
+      <ng-container *ngIf="currentView === 'analitica'">
+        <div class="profile-header glass-panel">
+          <div>
+            <h2 class="text-gradient">Analítica y Reportes Estratégicos</h2>
+            <p style="color: var(--text-muted);">Tableros de control para la toma de decisiones institucionales</p>
+          </div>
+          <button class="btn btn-outline"><i class="bi bi-download"></i> Descargar PDF</button>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card glass-panel">
+            <div class="card-header">
+              <h4><i class="bi bi-bar-chart-steps"></i> Ranking de Competencias Demandadas</h4>
+            </div>
+            <div class="card-body chart-container">
+              <canvas id="skillsChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card glass-panel">
+            <div class="card-header">
+              <h4><i class="bi bi-pie-chart-fill"></i> Estatus de Inserción Laboral</h4>
+            </div>
+            <div class="card-body chart-container">
+              <canvas id="placementChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="kpi-grid" style="margin-top: 1.5rem;">
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon info"><i class="bi bi-clock-history"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Tiempo Promedio Cobertura</span>
+              <h3 class="kpi-value">14 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">días</span></h3>
+            </div>
+          </div>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon warning"><i class="bi bi-journal-check"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Convenios por Vencer</span>
+              <h3 class="kpi-value">3 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">empresas</span></h3>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
     </div>
   </main>
 </div>
