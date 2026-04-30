@@ -535,7 +535,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   completeSurvey() {
-    if (this.hasCompletedSurvey) return;
+    if (this.hasCompletedSurvey) {
+      this.surveyOpen = !this.surveyOpen;
+      return;
+    }
     this.surveyOpen = true;
     this.surveyAnswers = {};
   }
