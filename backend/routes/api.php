@@ -152,6 +152,11 @@ Flight::route('POST /api/v1/evaluaciones', function() use ($evaluacion) {
     $evaluacion->saveResultados();
 });
 
+Flight::route('POST /api/v1/contratacion/externa', function() use ($empresa) {
+    if (!authMiddleware()) return;
+    $empresa->registrarContratacionExterna();
+});
+
 Flight::route('POST /api/v1/empresas/vacantes', function() use ($empresa) {
     if (!authMiddleware()) return;
     $empresa->crearVacante();
