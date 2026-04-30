@@ -3,18 +3,36 @@ namespace App\Controllers;
 
 use Flight;
 
+use App\Lib\GoogleDriveService;
+
 class EmpresaController extends BaseController {
+
+    private $driveService;
+
+    public function __construct() {
+        try {
+            $this->driveService = new GoogleDriveService();
+        } catch (\Exception $e) {
+            // Error manejado internamente
+        }
+    }
 
     /**
      * POST /api/v1/empresas/registrar
-     * Registro de empresa y creación de usuario
+     * Registro de empresa, creación de usuario y subida de convenio
      */
     public function registrarEmpresa() {
         $data = $this->getInput();
+        $files = Flight::request()->files;
+        $convenioFile = $files['convenio'] ?? null;
         
-        // Validación mínima
-        if (empty($data['usuario']) || empty($data['password']) || empty($data['razon_social'])) {
-            return Flight::json(['error' => 'Usuario, contraseña y razón social son requeridos'], 400);
+        // Validación obligatoria incluyendo el archivo
+        if (empty($data['usuario']) || empty($data['password']) || empty($data['razon_social']) || !$convenioFile) {
+            return Flight::json(['error' => 'Usuario, contraseña, razón social y archivo de convenio son requeridos'], 400);
+        }
+
+        if ($convenioFile['error'] !== UPLOAD_ERR_OK) {
+            return Flight::json(['error' => 'Error al recibir el archivo del convenio'], 400);
         }
 
         $this->db->beginTransaction();
@@ -26,15 +44,25 @@ class EmpresaController extends BaseController {
             $stmtUser->execute([$data['usuario'], $passHash]);
             $id_usuario = $this->db->lastInsertId();
 
-            // 2. Crear la Empresa vinculada
-            $stmtEmp = $this->db->prepare("INSERT INTO empresas (id_usuario, id_denue, razon_social) VALUES (?, ?, ?)");
+            // 2. Subir convenio a Google Drive
+            $folderId = $_ENV['DRIVE_FOLDER_CONVENIOS'];
+            $resultadoDrive = $this->driveService->uploadFile(
+                $convenioFile['name'],
+                $convenioFile['tmp_name'],
+                $convenioFile['type'],
+                $folderId
+            );
+
+            // 3. Crear la Empresa vinculada con la URL de Drive
+            $stmtEmp = $this->db->prepare("INSERT INTO empresas (id_usuario, id_denue, razon_social, url_convenio_drive) VALUES (?, ?, ?, ?)");
             $stmtEmp->execute([
                 $id_usuario,
                 $data['id_denue'] ?? null,
-                $data['razon_social']
+                $data['razon_social'],
+                $resultadoDrive['url']
             ]);
 
-            // 3. (Opcional) Información de contacto inicial
+            // 4. Información de contacto inicial
             if (!empty($data['email']) || !empty($data['telefono'])) {
                 $stmtCont = $this->db->prepare("INSERT INTO usuario_contacto (id_usuario, email, telefono, direccion) VALUES (?, ?, ?, ?)");
                 $stmtCont->execute([
@@ -46,7 +74,11 @@ class EmpresaController extends BaseController {
             }
 
             $this->db->commit();
-            return Flight::json(['mensaje' => 'Empresa registrada con éxito', 'id_usuario' => $id_usuario], 201);
+            return Flight::json([
+                'mensaje' => 'Empresa registrada y convenio subido con éxito',
+                'id_usuario' => $id_usuario,
+                'url_convenio' => $resultadoDrive['url']
+            ], 201);
 
         } catch (\Exception $e) {
             $this->db->rollBack();
