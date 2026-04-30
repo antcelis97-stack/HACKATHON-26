@@ -9,6 +9,7 @@ use App\Controllers\EvaluacionController;
 use App\Controllers\MatchController;
 use App\Controllers\ReporteController;
 use App\Controllers\GoogleDriveController;
+use App\Controllers\GraficaController;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 

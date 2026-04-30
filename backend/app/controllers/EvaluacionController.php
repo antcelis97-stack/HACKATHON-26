@@ -2,23 +2,37 @@
 namespace App\Controllers;
 
 use Flight;
+use PDO;
 
 class EvaluacionController extends BaseController {
+    /**
+     * POST /api/v1/evaluaciones
+     * Registrar un resultado de evaluación individual
+     */
     public function saveResultados() {
         $data = $this->getInput();
         
-        $stmt = $this->db->prepare("INSERT INTO evaluaciones (egresado_id, psicometricas, cognitivas, tecnicas, proyectivas) VALUES (?, ?, ?, ?, ?)");
-        
-        if ($stmt->execute([
-            $data['egresado_id'], 
-            $data['psicometricas'], 
-            $data['cognitivas'], 
-            $data['tecnicas'], 
-            $data['proyectivas']
-        ])) {
-            return Flight::json(['message' => 'Evaluación registrada con éxito'], 201);
+        if (!isset($data['cve_alumno'], $data['id_tipo'], $data['puntaje'])) {
+            return Flight::json(['error' => 'cve_alumno, id_tipo y puntaje son requeridos'], 400);
         }
-        
-        return Flight::json(['error' => 'Error al guardar los resultados'], 500);
+
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO resultados_evaluaciones (cve_alumno, id_tipo, puntaje) 
+                VALUES (?, ?, ?)
+                ON CONFLICT (cve_alumno, id_tipo) 
+                DO UPDATE SET puntaje = EXCLUDED.puntaje, fecha_registro = CURRENT_DATE, hora_registro = CURRENT_TIME
+            ");
+            
+            if ($stmt->execute([
+                $data['cve_alumno'], 
+                $data['id_tipo'], 
+                $data['puntaje']
+            ])) {
+                return Flight::json(['mensaje' => 'Evaluación registrada o actualizada con éxito'], 201);
+            }
+        } catch (\Exception $e) {
+            return Flight::json(['error' => 'Error al guardar los resultados', 'detalle' => $e->getMessage()], 500);
+        }
     }
 }
