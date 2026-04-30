@@ -117,17 +117,20 @@ Flight::route('POST /api/evaluaciones', function() use ($evaluacion) {
 });
 
 // --- MÓDULO ADMINISTRADOR (CONVENIOS Y FORMALIZACIÓN) ---
-Flight::route('GET /api/v1/admin/convenios/pendientes', function() use ($admin) {
+// --- MÓDULO ADMINISTRADOR (CONVENIOS Y EMPRESAS) ---
+Flight::route('GET /api/v1/admin/empresas/pendientes', function() use ($admin) {
     if (!authMiddleware()) return;
-    $admin->listarConveniosPendientes();
+    $admin->listarEmpresasPendientes();
 });
-Flight::route('GET /api/v1/admin/nacionales/pendientes', function() use ($admin) {
+
+Flight::route('POST /api/v1/admin/empresas/formalizar/@id', function($id) use ($admin) {
     if (!authMiddleware()) return;
-    $admin->listarNacionalesPendientes();
+    $admin->formalizarEmpresa($id);
 });
-Flight::route('POST /api/v1/admin/nacionales/formalizar/@id', function($id) use ($admin) {
+
+Flight::route('GET /api/v1/admin/convenios/aceptados', function() use ($admin) {
     if (!authMiddleware()) return;
-    $admin->formalizarEmpresaNacional($id);
+    $admin->listarConveniosAceptados();
 });
 
 // --- MÓDULO EGRESADO (POSTULACIONES Y BÚSQUEDA) ---

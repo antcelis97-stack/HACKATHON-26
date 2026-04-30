@@ -3,25 +3,38 @@ namespace App\Controllers;
 
 use Flight; 
 use PDO;
+use App\Lib\GoogleDriveService;
 
 class AdministradorController extends BaseController {
 
+    private $driveService;
+
+    public function __construct() {
+        try {
+            $this->driveService = new GoogleDriveService();
+        } catch (\Exception $e) {
+            // Error manejado
+        }
+    }
+
     /**
      * GET /api/v1/admin/convenios/pendientes
-     * Listar solicitudes de convenio en espera de revisión
+     * Listar todas las empresas (locales o nacionales) que requieren formalización
      */
-    public function listarConveniosPendientes() {
+    public function listarEmpresasPendientes() {
         try {
             $stmt = $this->db->query("
                 SELECT 
-                    c.id_convenio,
+                    e.id_empresa,
                     e.razon_social,
-                    c.url_archivo_drive,
+                    e.id_denue,
+                    c.id_convenio,
                     c.fecha_registro,
-                    c.estatus
-                FROM convenios c
-                JOIN empresas e ON c.id_empresa = e.id_empresa
-                WHERE c.estatus = 'en_revision'
+                    c.estatus,
+                    c.comentarios
+                FROM empresas e
+                JOIN convenios c ON e.id_empresa = c.id_empresa
+                WHERE c.estatus = 'pendiente' OR c.estatus = 'en_revision'
                 ORDER BY c.fecha_registro ASC
             ");
             return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
@@ -31,157 +44,82 @@ class AdministradorController extends BaseController {
     }
 
     /**
-     * POST /api/v1/admin/convenios/aprobar/@id
-     * Aprobación manual de un convenio
+     * POST /api/v1/admin/empresas/formalizar/@id
+     * El Administrador sube el convenio a Drive y activa la empresa
      */
-    public function aprobarConvenio($id) {
+    public function formalizarEmpresa($id_empresa) {
+        $files = Flight::request()->files;
+        $convenioFile = $files['convenio'] ?? null;
+
+        if (!$convenioFile || $convenioFile['error'] !== UPLOAD_ERR_OK) {
+            return Flight::json(['error' => 'El archivo del convenio es obligatorio para formalizar'], 400);
+        }
+
+        if (!$this->driveService) {
+            return Flight::json(['error' => 'Servicio de Google Drive no disponible'], 503);
+        }
+
         try {
             $this->db->beginTransaction();
 
-            // Calculamos vigencia de 2 años
+            // 1. Subir convenio a Google Drive
+            $folderId = $_ENV['DRIVE_FOLDER_CONVENIOS'];
+            $resultadoDrive = $this->driveService->uploadFile(
+                $convenioFile['name'],
+                $convenioFile['tmp_name'],
+                $convenioFile['type'],
+                $folderId
+            );
+
+            // 2. Activar el convenio en la base de datos
             $fechaInicio = date('Y-m-d');
             $fechaVencimiento = date('Y-m-d', strtotime('+2 years'));
 
             $stmt = $this->db->prepare("
                 UPDATE convenios 
                 SET estatus = 'activo', 
+                    url_archivo_drive = ?, 
                     fecha_inicio = ?, 
-                    fecha_vencimiento = ?, 
-                    comentarios = NULL 
-                WHERE id_convenio = ?
+                    fecha_vencimiento = ?,
+                    comentarios = 'Formalizado por Administrador'
+                WHERE id_empresa = ?
             ");
-            
-            $stmt->execute([$fechaInicio, $fechaVencimiento, $id]);
+            $stmt->execute([$resultadoDrive['url'], $fechaInicio, $fechaVencimiento, $id_empresa]);
+
+            // 3. Activar el estado de la empresa si estaba desactivado
+            $stmtEmp = $this->db->prepare("UPDATE empresas SET estado = TRUE WHERE id_empresa = ?");
+            $stmtEmp->execute([$id_empresa]);
 
             $this->db->commit();
             return Flight::json([
-                'mensaje' => 'Convenio aprobado con éxito',
-                'vigencia' => "Desde $fechaInicio hasta $fechaVencimiento"
+                'mensaje' => 'Empresa formalizada y activada correctamente',
+                'url_convenio' => $resultadoDrive['url']
             ], 200);
 
         } catch (\Exception $e) {
-            $this->db->rollBack();
-            return Flight::json(['error' => $e->getMessage()], 500);
+            if ($this->db->inTransaction()) $this->db->rollBack();
+            return Flight::json(['error' => 'Error al formalizar: ' . $e->getMessage()], 500);
         }
     }
 
     /**
      * POST /api/v1/admin/convenios/rechazar/@id
-     * Rechazo de convenio con motivo
      */
     public function rechazarConvenio($id) {
         $data = $this->getInput();
         $motivo = $data['motivo'] ?? 'No cumple con los requisitos institucionales';
 
         try {
-            $stmt = $this->db->prepare("
-                UPDATE convenios 
-                SET estatus = 'rechazado', 
-                    comentarios = ? 
-                WHERE id_convenio = ?
-            ");
+            $stmt = $this->db->prepare("UPDATE convenios SET estatus = 'rechazado', comentarios = ? WHERE id_convenio = ?");
             $stmt->execute([$motivo, $id]);
-
-            return Flight::json(['mensaje' => 'Convenio rechazado y notificado'], 200);
-
+            return Flight::json(['mensaje' => 'Convenio rechazado'], 200);
         } catch (\Exception $e) {
             return Flight::json(['error' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * GET /api/v1/admin/convenios/aceptados
-     */
     public function listarConveniosAceptados() {
-        try {
-            $stmt = $this->db->query("
-                SELECT c.id_convenio, e.razon_social, c.fecha_inicio, c.fecha_vencimiento, c.url_archivo_drive 
-                FROM convenios c JOIN empresas e ON c.id_empresa = e.id_empresa 
-                WHERE c.estatus = 'activo' ORDER BY c.fecha_vencimiento ASC
-            ");
-            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
-        } catch (\Exception $e) { return Flight::json(['error' => $e->getMessage()], 500); }
-    }
-
-    /**
-     * GET /api/v1/admin/convenios/rechazados
-     */
-    public function listarConveniosRechazados() {
-        try {
-            $stmt = $this->db->query("
-                SELECT c.id_convenio, e.razon_social, c.comentarios, c.fecha_registro, c.url_archivo_drive 
-                FROM convenios c JOIN empresas e ON c.id_empresa = e.id_empresa 
-                WHERE c.estatus = 'rechazado' ORDER BY c.fecha_registro DESC
-            ");
-            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
-        } catch (\Exception $e) { return Flight::json(['error' => $e->getMessage()], 500); }
-    }
-
-    /**
-     * GET /api/v1/admin/convenios/vencidos
-     */
-    public function listarConveniosVencidos() {
-        try {
-            $stmt = $this->db->query("
-                SELECT c.id_convenio, e.razon_social, c.fecha_vencimiento, c.url_archivo_drive 
-                FROM convenios c JOIN empresas e ON c.id_empresa = e.id_empresa 
-                WHERE c.estatus = 'vencido' OR (c.estatus = 'activo' AND c.fecha_vencimiento < CURRENT_DATE)
-                ORDER BY c.fecha_vencimiento DESC
-            ");
-            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
-        } catch (\Exception $e) { return Flight::json(['error' => $e->getMessage()], 500); }
-    }
-
-    /**
-     * GET /api/v1/admin/nacionales/pendientes
-     * Listar empresas del DENUE que requieren convenio institucional
-     */
-    public function listarNacionalesPendientes() {
-        try {
-            $stmt = $this->db->query("
-                SELECT e.id_empresa, e.razon_social, e.id_denue, e.sector, c.id_convenio
-                FROM empresas e
-                JOIN convenios c ON e.id_empresa = c.id_empresa
-                WHERE e.id_denue IS NOT NULL AND c.estatus = 'pendiente'
-            ");
-            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
-        } catch (\Exception $e) {
-            return Flight::json(['error' => $e->getMessage()], 500);
-        }
-    }
-
-    /**
-     * POST /api/v1/admin/nacionales/formalizar/@id
-     * El administrador sube el convenio y activa la empresa nacional
-     */
-    public function formalizarEmpresaNacional($id_empresa) {
-        $files = Flight::request()->files;
-        $convenio = $files['convenio'] ?? null;
-
-        if (!$convenio) {
-            return Flight::json(['error' => 'El archivo del convenio es obligatorio'], 400);
-        }
-
-        try {
-            $this->db->beginTransaction();
-
-            // 1. Subir a Drive (usamos el servicio inyectado si estuviera, o lógica directa)
-            // Para este ejemplo, asumo que el Admin sube el PDF y actualizamos el estatus
-            $stmt = $this->db->prepare("
-                UPDATE convenios 
-                SET estatus = 'activo', 
-                    fecha_inicio = CURRENT_DATE, 
-                    fecha_vencimiento = CURRENT_DATE + INTERVAL '2 years',
-                    url_archivo_drive = 'URL_SIMULADA_DRIVE' 
-                WHERE id_empresa = ? AND estatus = 'pendiente'
-            ");
-            $stmt->execute([$id_empresa]);
-
-            $this->db->commit();
-            return Flight::json(['mensaje' => 'Empresa nacional formalizada exitosamente'], 200);
-        } catch (\Exception $e) {
-            $this->db->rollBack();
-            return Flight::json(['error' => $e->getMessage()], 500);
-        }
+        $stmt = $this->db->query("SELECT c.id_convenio, e.razon_social, c.fecha_inicio, c.fecha_vencimiento, c.url_archivo_drive FROM convenios c JOIN empresas e ON c.id_empresa = e.id_empresa WHERE c.estatus = 'activo'");
+        return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
 }

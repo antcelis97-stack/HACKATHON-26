@@ -31,7 +31,16 @@ class EmpresaController extends BaseController {
                 $data['ubicacion'] ?? null
             ]);
 
-            return Flight::json(['mensaje' => 'Perfil de empresa registrado exitosamente'], 201);
+            $id_empresa = $this->db->lastInsertId();
+
+            // CREAR CONVENIO PENDIENTE: Todas las empresas deben ser formalizadas por el Admin
+            $stmtConv = $this->db->prepare("
+                INSERT INTO convenios (id_empresa, estatus, comentarios) 
+                VALUES (?, 'pendiente', 'Registro inicial: Pendiente de formalización institucional')
+            ");
+            $stmtConv->execute([$id_empresa]);
+
+            return Flight::json(['mensaje' => 'Perfil de empresa registrado. Pendiente de formalización por el Administrador.'], 201);
 
         } catch (\Exception $e) {
             return Flight::json(['error' => 'Error al registrar perfil', 'detalle' => $e->getMessage()], 500);
