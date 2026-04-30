@@ -196,6 +196,11 @@ Flight::route('GET /api/reportes/convenios/estatus', function() use ($reporte) {
     $reporte->getEstatusConvenios();
 });
 
+Flight::route('GET /api/v1/graficas/admin/estatus-laboral', function() use ($grafica) {
+    if (!authMiddleware()) return;
+    $grafica->getEstatusLaboralGlobal();
+});
+
 // 2. Talento / Egresado
 Flight::route('GET /api/reportes/histograma/@egresadoId', function($egresadoId) use ($reporte) {
     if (!authMiddleware()) return;
