@@ -9,10 +9,13 @@ use App\Controllers\EmpresaController;
 use App\Controllers\EvaluacionController;
 use App\Controllers\MatchController;
 use App\Controllers\ReporteController;
+use App\Controllers\InegiController;
 use App\Controllers\GoogleDriveController;
 use App\Controllers\GraficaController;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+
+// ... (omitir middleware y otros por brevedad si es posible, pero mejor reemplazar bloque)
 
 // 1. Cargar variables de entorno
 if (file_exists(__DIR__ . '/../.env')) {
@@ -52,6 +55,7 @@ $empresa = new EmpresaController();
 $evaluacion = new EvaluacionController();
 $match = new MatchController();
 $reporte = new ReporteController();
+$inegi = new InegiController();
 $drive = new GoogleDriveController();
 $grafica = new GraficaController();
 
@@ -70,6 +74,9 @@ Flight::route('POST /api/v1/refresh-token', function() use ($login) {
     $login->refreshToken();
 });
 Flight::route('POST /api/v1/cerrar-sesion', [$login, 'cerrarSesion']);
+
+// Búsqueda INEGI DENUE
+Flight::route('GET /api/inegi/buscar', [$inegi, 'buscar']);
 
 // =============================================================================
 // RUTAS PROTEGIDAS
