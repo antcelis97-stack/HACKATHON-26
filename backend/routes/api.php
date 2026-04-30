@@ -219,6 +219,11 @@ Flight::route('POST /api/v1/empresas/vacantes', function() use ($empresa) {
     $empresa->crearVacante();
 });
 
+Flight::route('POST /api/v1/contratacion/externa', function() use ($empresa) {
+    if (!authMiddleware()) return;
+    $empresa->registrarContratacionExterna();
+});
+
 Flight::route('GET /api/v1/empresas/vacantes/@id', function($id) use ($empresa) {
     if (!authMiddleware()) return;
     $empresa->obtenerVacantesActivas($id);
