@@ -150,9 +150,9 @@ Flight::route('POST /api/v1/empresas/vacantes', function() use ($empresa) {
     $empresa->createVacante();
 });
 
-Flight::route('GET /api/v1/match/vacante/@id', function($id) use ($match) {
+Flight::route('GET /api/v1/match/talento/@id', function($id) use ($match) {
     if (!authMiddleware()) return;
-    $match->getCandidatosIdoneos($id);
+    $match->matchTalento($id);
 });
 
 // =============================================================================
