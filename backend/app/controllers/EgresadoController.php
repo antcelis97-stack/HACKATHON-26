@@ -7,34 +7,39 @@ use PDO;
 class EgresadoController extends BaseController {
     
     /**
-     * GET /api/egresados/{usuarioId}
-     * Obtener perfil del egresado
+     * GET /api/v1/egresados/perfil/@usuarioId
+     * Obtener perfil del egresado con información de contacto
      */
-    public function getProfile($usuarioId) {
+    public function obtenerPerfil($usuarioId) {
         try {
-            // Consultar información del egresado con datos del usuario
+            // Consultar información del egresado con datos del usuario y contacto
             $stmt = $this->db->prepare("
                 SELECT 
-                    u.cve_usuario as usuario_id,
-                    u.usuario,
-                    u.email,
-                    e.especialidad,
-                    e.trayectoria,
-                    e.cv_url,
-                    u.nombre
+                    u.id_usuario as usuario_id,
+                    u.username as usuario,
+                    e.cve_alumno,
+                    e.nombre,
+                    e.apellido_paterno,
+                    e.apellido_materno,
+                    e.url_foto_drive,
+                    e.url_cv_drive,
+                    c.direccion,
+                    c.email as email_contacto,
+                    c.telefono
                 FROM usuarios u
-                LEFT JOIN egresados e ON u.cve_usuario = e.usuario_id
-                WHERE u.cve_usuario = ?
+                LEFT JOIN egresados e ON u.id_usuario = e.id_usuario
+                LEFT JOIN usuario_contacto c ON u.id_usuario = c.id_usuario
+                WHERE u.id_usuario = ?
             ");
             
             $stmt->execute([$usuarioId]);
-            $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+            $perfil = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            if (!$profile) {
+            if (!$perfil) {
                 return Flight::json(['error' => 'Egresado no encontrado'], 404);
             }
             
-            return Flight::json($profile, 200);
+            return Flight::json($perfil, 200);
             
         } catch (\Exception $e) {
             return Flight::json([
@@ -45,44 +50,46 @@ class EgresadoController extends BaseController {
     }
 
     /**
-     * POST /api/egresados/update-profile
-     * Actualizar perfil del egresado
+     * POST /api/v1/egresados/perfil/actualizar
+     * Actualizar perfil e información de contacto del egresado
      */
-    public function updateProfile() {
+    public function actualizarPerfil() {
         try {
             $data = $this->getInput();
+            $usuario_id = $data['usuario_id'] ?? null;
             
-            // Validación básica
-            if (empty($data['usuario_id'])) {
+            if (!$usuario_id) {
                 return Flight::json(['error' => 'usuario_id es requerido'], 400);
             }
             
-            // Actualizar tabla usuarios con nombre
-            if (!empty($data['nombre'])) {
-                $stmtUser = $this->db->prepare("UPDATE usuarios SET nombre = ? WHERE cve_usuario = ?");
-                $stmtUser->execute([$data['nombre'], $data['usuario_id']]);
-            }
-            
-            // Actualizar tabla egresados con especialidad, trayectoria y cv_url
-            $stmt = $this->db->prepare("
+            // 1. Actualizar tabla Egresados
+            $stmtE = $this->db->prepare("
                 UPDATE egresados 
-                SET 
-                    especialidad = ?,
-                    trayectoria = ?,
-                    cv_url = ?
-                WHERE usuario_id = ?
+                SET nombre = ?, apellido_paterno = ?, apellido_materno = ?
+                WHERE id_usuario = ?
             ");
+            $stmtE->execute([
+                $data['nombre'] ?? null,
+                $data['apellido_paterno'] ?? null,
+                $data['apellido_materno'] ?? null,
+                $usuario_id
+            ]);
+
+            // 2. Actualizar o Insertar en usuario_contacto
+            $stmtC = $this->db->prepare("
+                INSERT INTO usuario_contacto (id_usuario, direccion, email, telefono)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT (id_usuario) 
+                DO UPDATE SET direccion = EXCLUDED.direccion, email = EXCLUDED.email, telefono = EXCLUDED.telefono
+            ");
+            $stmtC->execute([
+                $usuario_id,
+                $data['direccion'] ?? null,
+                $data['email_contacto'] ?? null,
+                $data['telefono'] ?? null
+            ]);
             
-            if ($stmt->execute([
-                $data['especialidad'] ?? null,
-                $data['trayectoria'] ?? null,
-                $data['cv_url'] ?? null,
-                $data['usuario_id']
-            ])) {
-                return Flight::json(['message' => 'Perfil actualizado correctamente'], 200);
-            }
-            
-            return Flight::json(['error' => 'Error al actualizar perfil'], 500);
+            return Flight::json(['mensaje' => 'Perfil y contacto actualizados correctamente'], 200);
             
         } catch (\Exception $e) {
             return Flight::json([
