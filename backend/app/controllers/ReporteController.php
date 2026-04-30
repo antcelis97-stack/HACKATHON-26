@@ -10,52 +10,88 @@ class ReporteController extends BaseController {
 
     public function getInsercionLaboral() {
         // Porcentaje de contratados vs registrados segmentado por carrera.
-        $stmt = $this->db->query("SELECT carrera, COUNT(*) as total, 
-                SUM(CASE WHEN contratado = true THEN 1 ELSE 0 END) as contratados 
-                FROM egresados GROUP BY carrera");
+        $stmt = $this->db->query("SELECT c.nombre_carrera as carrera, COUNT(e.cve_alumno) as total, 
+                SUM(CASE WHEN e.estatus_laboral = 'contratado' THEN 1 ELSE 0 END) as contratados 
+                FROM carreras c
+                LEFT JOIN egresados e ON c.id_carrera = e.id_carrera
+                GROUP BY c.nombre_carrera");
         return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
 
     public function getMapaCalor() {
         // Concentración geográfica: Zona de influencia vs Nacional.
         $stmt = $this->db->query("SELECT ubicacion, COUNT(*) as empresas 
-                FROM empresas WHERE convenio_activo = true GROUP BY ubicacion");
+                FROM empresas WHERE estado = true GROUP BY ubicacion");
         return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
 
     public function getRankingCompetencias() {
         // Habilidades técnicas y blandas solicitadas con mayor frecuencia.
-        // Se asume que 'habilidades' es una columna tipo JSONB o texto.
-        $stmt = $this->db->query("SELECT habilidad, COUNT(*) as demanda 
-                FROM vacante_habilidades GROUP BY habilidad ORDER BY demanda DESC LIMIT 10");
+        $stmt = $this->db->query("SELECT titulo_puesto as habilidad, COUNT(*) as demanda 
+                FROM vacantes GROUP BY titulo_puesto ORDER BY demanda DESC LIMIT 10");
         return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
 
     public function getEstatusConvenios() {
-        // Reporte administrativo de convenios y formalización vía API.
-        $stmt = $this->db->query("SELECT nombre_empresa, fecha_vencimiento, 
-                CASE WHEN origen_api = true THEN 'Pendiente Formalizar' ELSE 'Activo' END as estatus 
-                FROM empresas WHERE convenio_activo = true");
+        // Reporte administrativo de convenios.
+        $stmt = $this->db->query("SELECT razon_social as nombre_empresa, 
+                (SELECT fecha_vencimiento FROM convenios c WHERE c.id_empresa = e.id_empresa LIMIT 1) as fecha_vencimiento,
+                (SELECT estatus FROM convenios c WHERE c.id_empresa = e.id_empresa LIMIT 1) as estatus
+                FROM empresas e WHERE estado = true");
         return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
 
     // --- 2. REPORTES DE TALENTO (EGRESADO) ---
 
+    /**
+     * GET /api/v1/reportes/encabezado/@id
+     * Obtiene los datos básicos para el encabezado de un reporte de egresado
+     */
+    public function getEncabezadoReporte($id_usuario) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 
+                    (e.nombre || ' ' || e.apellidos) as nombre_completo,
+                    e.foto_url,
+                    c.nombre_carrera as carrera
+                FROM egresados e
+                JOIN carreras c ON e.id_carrera = c.id_carrera
+                WHERE e.id_usuario = ?
+            ");
+            $stmt->execute([$id_usuario]);
+            $datos = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$datos) {
+                return Flight::json(['error' => 'Egresado no encontrado'], 404);
+            }
+
+            return Flight::json($datos, 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function getHistograma($egresadoId) {
         // Cuantificación de capacidades en las 4 categorías.
-        $stmt = $this->db->prepare("SELECT psicometricas, cognitivas, tecnicas, proyectivas 
-                FROM evaluaciones WHERE egresado_id = ?");
+        $stmt = $this->db->prepare("SELECT min_psicometrico as psicometricas, min_cognitivo as cognitivas, 
+                min_tecnico as tecnicas, min_proyectivo as proyectivas 
+                FROM egresados WHERE id_usuario = ?");
         $stmt->execute([$egresadoId]);
         return Flight::json($stmt->fetch(PDO::FETCH_ASSOC), 200);
+    }
+
+    public function getRadarCompetencias($egresadoId) {
+        // Alias para compatibilidad con la ruta de la API
+        return $this->getHistograma($egresadoId);
     }
 
     public function getRadarComparativo($egresadoId, $vacanteId) {
         // Spider Chart: Perfil real vs Perfil ideal de la vacante.
         $stmt = $this->db->prepare("
-            SELECT e.psicometricas as real_psi, e.tecnicas as real_tec, 
-                   v.req_psicometricos as ideal_psi, v.req_tecnicos as ideal_tec
-            FROM evaluaciones e, vacantes v 
-            WHERE e.egresado_id = ? AND v.id = ?");
+            SELECT e.min_psicometrico as real_psi, e.min_tecnico as real_tec, 
+                   v.min_psicometrico as ideal_psi, v.min_tecnico as ideal_tec
+            FROM egresados e, vacantes v 
+            WHERE e.id_usuario = ? AND v.id_vacante = ?");
         $stmt->execute([$egresadoId, $vacanteId]);
         return Flight::json($stmt->fetch(PDO::FETCH_ASSOC), 200);
     }
@@ -64,19 +100,19 @@ class ReporteController extends BaseController {
 
     public function getAnaliticaVacantes($empresaId) {
         // Postulaciones y tiempo promedio de cobertura.
-        $stmt = $this->db->prepare("SELECT titulo, COUNT(p.id) as postulaciones, 
-                AVG(p.fecha_contratacion - v.fecha_publicacion) as dias_cobertura
-                FROM vacantes v LEFT JOIN postulaciones p ON v.id = p.vacante_id 
-                WHERE v.empresa_id = ? GROUP BY v.id");
+        $stmt = $this->db->prepare("SELECT titulo_puesto as titulo, COUNT(p.id_postulacion) as postulaciones
+                FROM vacantes v LEFT JOIN postulaciones p ON v.id_vacante = p.id_vacante 
+                WHERE v.id_empresa = ? GROUP BY v.id_vacante, v.titulo_puesto");
         $stmt->execute([$empresaId]);
         return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
 
     public function getPlantillaUT($empresaId) {
         // Listado de egresados laborando actualmente en la empresa.
-        $stmt = $this->db->prepare("SELECT nombre, carrera, evaluacion_desempeno 
-                FROM egresados WHERE empresa_actual_id = ?");
-        $stmt->execute([$empresaId]);
+        $stmt = $this->db->prepare("SELECT nombre, apellidos, estatus_laboral 
+                FROM egresados WHERE id_usuario IN (SELECT id_usuario FROM usuarios WHERE rol = 'egresado')");
+        // Nota: Esta consulta debe ajustarse según cómo registres la relación empresa-egresado contratado
+        $stmt->execute();
         return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
 }
