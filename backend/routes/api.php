@@ -129,6 +129,11 @@ Flight::route('GET /api/v1/reportes/institucional/monitoreo', function() use ($r
     $reporte->obtenerMonitoreoInstitucional();
 });
 
+Flight::route('GET /api/v1/reportes/insercion/carrera', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->obtenerInsercionLaboralPorCarrera();
+});
+
 Flight::route('GET /api/v1/reportes/radar/@usuarioId', function($usuarioId) use ($reporte) {
     if (!authMiddleware()) return;
     $reporte->getRadarCompetencias($usuarioId);

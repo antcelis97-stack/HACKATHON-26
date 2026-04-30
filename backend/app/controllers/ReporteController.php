@@ -74,7 +74,30 @@ class ReporteController extends BaseController {
         $stmt->execute([$usuarioId]);
         return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
-        
-        return Flight::json(['error' => 'No hay evaluaciones para este egresado'], 404);
+
+    /**
+     * Reporte de Inserción Laboral: Segmentado por carrera
+     */
+    public function obtenerInsercionLaboralPorCarrera() {
+        try {
+            $stmt = $this->db->query("
+                SELECT 
+                    c.nombre_carrera,
+                    COUNT(DISTINCT e.cve_alumno) as total_egresados,
+                    COUNT(DISTINCT CASE WHEN p.estatus = 'contratado' THEN e.cve_alumno END) as contratados,
+                    ROUND(
+                        COUNT(DISTINCT CASE WHEN p.estatus = 'contratado' THEN e.cve_alumno END)::numeric / 
+                        NULLIF(COUNT(DISTINCT e.cve_alumno), 0) * 100, 2
+                    ) as porcentaje_insercion
+                FROM carreras c
+                LEFT JOIN egresados e ON c.id_carrera = e.id_carrera
+                LEFT JOIN postulaciones p ON e.cve_alumno = p.cve_alumno
+                GROUP BY c.id_carrera, c.nombre_carrera
+                ORDER BY porcentaje_insercion DESC
+            ");
+            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
     }
 }
