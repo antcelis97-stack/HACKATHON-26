@@ -155,4 +155,36 @@ class EgresadoController extends BaseController {
             return Flight::json(['error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * POST /api/v1/postulaciones/aplicar
+     * El egresado se postula a una vacante activa
+     */
+    public function postularseAVacante() {
+        $user = Flight::get('user');
+        $data = $this->getInput();
+        $id_vacante = $data['id_vacante'] ?? null;
+
+        if (!$id_vacante) {
+            return Flight::json(['error' => 'ID de vacante es requerido'], 400);
+        }
+
+        try {
+            // 1. Obtener la matrícula del alumno
+            $stmtAlumno = $this->db->prepare("SELECT cve_alumno FROM egresados WHERE id_usuario = ?");
+            $stmtAlumno->execute([$user->sub]);
+            $cve_alumno = $stmtAlumno->fetchColumn();
+
+            // 2. Registrar la postulación
+            $stmt = $this->db->prepare("
+                INSERT INTO postulaciones (cve_alumno, id_vacante, estatus) 
+                VALUES (?, ?, 'pendiente')
+            ");
+            $stmt->execute([$cve_alumno, $id_vacante]);
+
+            return Flight::json(['mensaje' => 'Postulación registrada exitosamente'], 201);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

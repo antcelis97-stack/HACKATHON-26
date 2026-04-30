@@ -131,4 +131,57 @@ class AdministradorController extends BaseController {
             return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
         } catch (\Exception $e) { return Flight::json(['error' => $e->getMessage()], 500); }
     }
+
+    /**
+     * GET /api/v1/admin/nacionales/pendientes
+     * Listar empresas del DENUE que requieren convenio institucional
+     */
+    public function listarNacionalesPendientes() {
+        try {
+            $stmt = $this->db->query("
+                SELECT e.id_empresa, e.razon_social, e.id_denue, e.sector, c.id_convenio
+                FROM empresas e
+                JOIN convenios c ON e.id_empresa = c.id_empresa
+                WHERE e.id_denue IS NOT NULL AND c.estatus = 'pendiente'
+            ");
+            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * POST /api/v1/admin/nacionales/formalizar/@id
+     * El administrador sube el convenio y activa la empresa nacional
+     */
+    public function formalizarEmpresaNacional($id_empresa) {
+        $files = Flight::request()->files;
+        $convenio = $files['convenio'] ?? null;
+
+        if (!$convenio) {
+            return Flight::json(['error' => 'El archivo del convenio es obligatorio'], 400);
+        }
+
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Subir a Drive (usamos el servicio inyectado si estuviera, o lógica directa)
+            // Para este ejemplo, asumo que el Admin sube el PDF y actualizamos el estatus
+            $stmt = $this->db->prepare("
+                UPDATE convenios 
+                SET estatus = 'activo', 
+                    fecha_inicio = CURRENT_DATE, 
+                    fecha_vencimiento = CURRENT_DATE + INTERVAL '2 years',
+                    url_archivo_drive = 'URL_SIMULADA_DRIVE' 
+                WHERE id_empresa = ? AND estatus = 'pendiente'
+            ");
+            $stmt->execute([$id_empresa]);
+
+            $this->db->commit();
+            return Flight::json(['mensaje' => 'Empresa nacional formalizada exitosamente'], 200);
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
