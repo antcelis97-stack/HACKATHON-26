@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Controllers\AdministradorController;
 use App\Controllers\AuthController;
 use App\Controllers\LoginController;
 use App\Controllers\EgresadoController;
@@ -44,6 +45,7 @@ function authMiddleware(): bool {
 }
 
 // Instanciar controladores
+$admin = new AdministradorController();
 $login = new LoginController();
 $egresado = new EgresadoController();
 $empresa = new EmpresaController();
@@ -72,6 +74,32 @@ Flight::route('POST /api/v1/cerrar-sesion', [$login, 'cerrarSesion']);
 // =============================================================================
 // RUTAS PROTEGIDAS
 // =============================================================================
+
+// --- MÓDULO ADMINISTRADOR (GESTIÓN DE CONVENIOS) ---
+Flight::route('GET /api/v1/admin/convenios/pendientes', function() use ($admin) {
+    if (!authMiddleware()) return;
+    if (Flight::get('user')->rol !== 'admin') {
+        return Flight::json(['error' => 'Acceso denegado'], 403);
+    }
+    $admin->listarConveniosPendientes();
+});
+
+Flight::route('POST /api/v1/admin/convenios/aprobar/@id', function($id) use ($admin) {
+    if (!authMiddleware()) return;
+    if (Flight::get('user')->rol !== 'admin') {
+        return Flight::json(['error' => 'Acceso denegado'], 403);
+    }
+    $admin->aprobarConvenio($id);
+});
+
+Flight::route('POST /api/v1/admin/convenios/rechazar/@id', function($id) use ($admin) {
+    if (!authMiddleware()) return;
+    if (Flight::get('user')->rol !== 'admin') {
+        return Flight::json(['error' => 'Acceso denegado'], 403);
+    }
+    $admin->rechazarConvenio($id);
+});
+
 
 // Registro de empresa
 Flight::route('POST /api/v1/empresas/registrar', [$empresa, 'registrarEmpresa']);
@@ -113,7 +141,7 @@ Flight::route('DELETE /api/v1/drive/eliminar/@id', function($id) use ($drive) {
     $drive->eliminarArchivo($id);
 });
 
-// --- MÓDULO REPORTES (DASHBOARDS ESTRATÉGICOS) ---
+// --- MÓDULO REPORTES ---
 Flight::route('GET /api/v1/reportes/egresados/aptitudes', function() use ($reporte) {
     if (!authMiddleware()) return;
     $reporte->obtenerAptitudesPredominantes();

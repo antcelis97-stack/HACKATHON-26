@@ -101,12 +101,23 @@ class EmpresaController extends BaseController {
     public function crearVacante() {
         $data = $this->getInput();
         
-        // Validación de campos obligatorios
+        // 1. Validación de campos obligatorios
         if (!isset($data['id_empresa'], $data['titulo_puesto'])) {
             return Flight::json(['error' => 'ID de empresa y título del puesto son requeridos'], 400);
         }
 
         try {
+            // 2. SEGURIDAD: Verificar si la empresa tiene un convenio ACTIVO
+            $stmtCheck = $this->db->prepare("
+                SELECT COUNT(*) FROM convenios 
+                WHERE id_empresa = ? AND estatus = 'activo' AND (fecha_vencimiento >= CURRENT_DATE OR fecha_vencimiento IS NULL)
+            ");
+            $stmtCheck->execute([$data['id_empresa']]);
+            if ($stmtCheck->fetchColumn() == 0) {
+                return Flight::json(['error' => 'Su empresa no tiene un convenio activo o vigente. No puede publicar vacantes aún.'], 403);
+            }
+
+            // 3. Inserción de la vacante
             $stmt = $this->db->prepare("
                 INSERT INTO vacantes (
                     id_empresa, 
