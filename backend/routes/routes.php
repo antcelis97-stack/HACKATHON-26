@@ -20,6 +20,8 @@ require_once __DIR__ . '/../app/controllers/AuditoriasController.php';
 require_once __DIR__ . '/../app/controllers/PapeleraController.php';
 require_once __DIR__ . '/../app/controllers/PrestamosController.php';
 require_once __DIR__ . '/../app/controllers/DirectorController.php';
+require_once __DIR__ . '/../app/controllers/GoogleDriveController.php';
+
 
 use App\Lib\ResponseFormatter;
 use App\Lib\UnauthorizedException;
@@ -112,6 +114,11 @@ Flight::route('GET /api/v1/empleados/@id', function($id) {
     \App\controllers\EjemploController::ver((int)$id);
 });
 
+// Ver empleado por ID (público)
+Flight::route('GET /api/v1/empleados/@id', function($id) {
+    \App\controllers\EjemploController::ver((int)$id);
+});
+
 // =============================================================================
 // RUTAS PROTEGIDAS (requieren autenticación)
 // =============================================================================
@@ -126,6 +133,37 @@ Flight::route('POST /api/v1/empleados', function() {
 Flight::route('GET /api/v1/perfil/nombre', function() {
     if (!authMiddleware()) return;
     \app\controllers\LoginController::getNombreUsuario();
+});
+
+// Google Drive
+Flight::route('POST /api/v1/drive/subir/cv', function() {
+    if (!authMiddleware()) return;
+    $controller = new \App\Controllers\GoogleDriveController();
+    $controller->subirCV();
+});
+
+Flight::route('POST /api/v1/drive/subir/foto', function() {
+    if (!authMiddleware()) return;
+    $controller = new \App\Controllers\GoogleDriveController();
+    $controller->subirFoto();
+});
+
+Flight::route('POST /api/v1/drive/subir/logo', function() {
+    if (!authMiddleware()) return;
+    $controller = new \App\Controllers\GoogleDriveController();
+    $controller->subirLogo();
+});
+
+Flight::route('POST /api/v1/drive/subir/convenio', function() {
+    if (!authMiddleware()) return;
+    $controller = new \App\Controllers\GoogleDriveController();
+    $controller->subirConvenio();
+});
+
+Flight::route('DELETE /api/v1/drive/eliminar/@id', function($id) {
+    if (!authMiddleware()) return;
+    $controller = new \App\Controllers\GoogleDriveController();
+    $controller->eliminarArchivo($id);
 });
 
 
