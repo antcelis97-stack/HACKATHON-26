@@ -101,3 +101,27 @@ CREATE TABLE postulaciones (
  hora_registro TIME DEFAULT CURRENT_TIME,
  estado BOOLEAN DEFAULT TRUE
 );
+
+-- =============================================================================
+-- DATOS DE PRUEBA (CONTRASEÑA: password123)
+-- =============================================================================
+
+-- Credenciales de acceso para pruebas:
+-- Usuario: egresado_test | Password: password123
+-- Usuario: empresa_test  | Password: password123
+
+INSERT INTO usuarios (username, password_hash, rol) VALUES 
+('egresado_test', '$2a$12$R9h/cIPz0gi.URQHeNVwCOVuxTkFz/1VYmSGYzYrfwj6JJvVPQU7a', 'egresado'),
+('empresa_test', '$2a$12$R9h/cIPz0gi.URQHeNVwCOVuxTkFz/1VYmSGYzYrfwj6JJvVPQU7a', 'empresa');
+
+INSERT INTO usuario_contacto (id_usuario, direccion, email, telefono) VALUES 
+(1, 'Calle Prueba 123', 'test@egresado.com', '5551234567'),
+(2, 'Av. Empresa 456', 'test@empresa.com', '5559876543');
+
+INSERT INTO egresados (cve_alumno, id_usuario, nombre, apellido_paterno) VALUES 
+('2024TEST', 1, 'Usuario', 'Prueba');
+
+INSERT INTO empresas (id_usuario, nombre_empresa, rfc) VALUES 
+(2, 'Empresa de Prueba', 'PRU123456789');
+
+
