@@ -146,6 +146,21 @@ Flight::route('GET /api/v1/vacantes/nacionales', function() use ($egresado) {
 });
 
 // --- MÓDULO EMPRESA ---
+Flight::route('GET /api/v1/empresa/header/@id', function($id) use ($empresa) {
+    if (!authMiddleware()) return;
+    $empresa->getDatosEncabezado($id);
+});
+
+Flight::route('GET /api/v1/empresa/dashboard/resumen-vacantes/@id', function($id) use ($empresa) {
+    if (!authMiddleware()) return;
+    $empresa->getContadorVacantes($id);
+});
+
+Flight::route('GET /api/v1/empresa/dashboard/resumen-contrataciones/@id', function($id) use ($empresa) {
+    if (!authMiddleware()) return;
+    $empresa->getContadorContrataciones($id);
+});
+
 Flight::route('POST /api/empresas/vacantes', function() use ($empresa) {
     if (!authMiddleware()) return;
     $empresa->createVacante();

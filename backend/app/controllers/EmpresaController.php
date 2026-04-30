@@ -39,6 +39,68 @@ class EmpresaController extends BaseController {
     }
 
     /**
+     * GET /api/v1/empresa/dashboard/resumen-vacantes/@id
+     * Retorna el número total de vacantes publicadas.
+     */
+    public function getContadorVacantes($id_empresa) {
+        try {
+            $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM vacantes WHERE id_empresa = ?");
+            $stmt->execute([$id_empresa]);
+            return Flight::json($stmt->fetch(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * GET /api/v1/empresa/dashboard/resumen-contrataciones/@id
+     * Retorna el número de contrataciones exitosas (egresados aceptados).
+     */
+    public function getContadorContrataciones($id_empresa) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT COUNT(*) as aceptadas 
+                FROM contrataciones c
+                JOIN vacantes v ON c.id_vacante = v.id_vacante
+                WHERE v.id_empresa = ?
+            ");
+            $stmt->execute([$id_empresa]);
+            return Flight::json($stmt->fetch(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * GET /api/v1/empresa/header/@id
+     * Retorna info de identidad: Nombre, Logo, Correo y Teléfono.
+     */
+    public function getDatosEncabezado($id_empresa) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 
+                    e.razon_social, 
+                    e.url_logo_drive as logo,
+                    c.email, 
+                    c.telefono
+                FROM empresas e
+                LEFT JOIN usuario_contacto c ON e.id_usuario = c.id_usuario
+                WHERE e.id_empresa = ?
+            ");
+            $stmt->execute([$id_empresa]);
+            $datos = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$datos) {
+                return Flight::json(['error' => 'Empresa no encontrada'], 404);
+            }
+
+            return Flight::json($datos, 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * POST /api/v1/empresas/vacantes
      * Crear una nueva vacante de empleo
      */
