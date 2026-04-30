@@ -111,6 +111,27 @@ Flight::route('DELETE /api/v1/drive/eliminar/@id', function($id) use ($drive) {
     $drive->eliminarArchivo($id);
 });
 
+// --- MÓDULO REPORTES (DASHBOARDS ESTRATÉGICOS) ---
+Flight::route('GET /api/v1/reportes/egresados/aptitudes', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->obtenerAptitudesPredominantes();
+});
+
+Flight::route('GET /api/v1/reportes/empresas/estadisticas', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->obtenerEstadisticasEmpresariales();
+});
+
+Flight::route('GET /api/v1/reportes/institucional/monitoreo', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->obtenerMonitoreoInstitucional();
+});
+
+Flight::route('GET /api/v1/reportes/radar/@usuarioId', function($usuarioId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getRadarCompetencias($usuarioId);
+});
+
 // --- OTROS MÓDULOS ---
 Flight::route('POST /api/v1/evaluaciones', function() use ($evaluacion) {
     if (!authMiddleware()) return;
