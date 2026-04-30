@@ -106,22 +106,33 @@ CREATE TABLE postulaciones (
 -- DATOS DE PRUEBA (CONTRASEÑA: password123)
 -- =============================================================================
 
--- Credenciales de acceso para pruebas:
--- Usuario: egresado_test | Password: password123
--- Usuario: empresa_test  | Password: password123
-
+-- 1. Usuarios (Hash para 'password123')
 INSERT INTO usuarios (username, password_hash, rol) VALUES 
 ('egresado_test', '$2a$12$R9h/cIPz0gi.URQHeNVwCOVuxTkFz/1VYmSGYzYrfwj6JJvVPQU7a', 'egresado'),
 ('empresa_test', '$2a$12$R9h/cIPz0gi.URQHeNVwCOVuxTkFz/1VYmSGYzYrfwj6JJvVPQU7a', 'empresa');
 
+-- 2. Información de Contacto
 INSERT INTO usuario_contacto (id_usuario, direccion, email, telefono) VALUES 
-(1, 'Calle Prueba 123', 'test@egresado.com', '5551234567'),
-(2, 'Av. Empresa 456', 'test@empresa.com', '5559876543');
+(1, 'Calle de las Flores #123, Col. Centro', 'juan.egresado@correo.com', '555-0101'),
+(2, 'Parque Industrial Norte, Bodega 4', 'rh@empresa-tech.com', '555-9090');
 
-INSERT INTO egresados (cve_alumno, id_usuario, nombre, apellido_paterno) VALUES 
-('2024TEST', 1, 'Usuario', 'Prueba');
+-- 3. Carreras
+INSERT INTO carreras (nombre_carrera) VALUES 
+('Ingeniería en Software'),
+('Licenciatura en Administración');
 
-INSERT INTO empresas (id_usuario, nombre_empresa, rfc) VALUES 
-(2, 'Empresa de Prueba', 'PRU123456789');
+-- 4. Egresados (Matrícula, Usuario, Carrera, etc.)
+INSERT INTO egresados (cve_alumno, id_usuario, id_carrera, nombre, apellido_paterno, apellido_materno, especialidad) VALUES 
+('20240001', 1, 1, 'Juan', 'Pérez', 'Gómez', 'Desarrollo de Software');
+
+-- 5. Empresas (Usuario, DENUE, Razón Social)
+INSERT INTO empresas (id_usuario, id_denue, razon_social) VALUES 
+(2, '1234567890', 'Tech Innovations S.A. de C.V.');
+
+-- 6. Tipos de Evaluación
+INSERT INTO tipos_evaluacion (nombre_tipo) VALUES 
+('Psicométrica'),
+('Cognitiva'),
+('Técnica');
 
 
