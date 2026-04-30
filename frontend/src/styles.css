@@ -1,58 +1,120 @@
 :root {
-  /* Brand Colors - Ocean/Tech inspired for UT de la Costa */
-  --primary-50: #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-500: #3b82f6;
-  --primary-600: #2563eb;
-  --primary-900: #1e3a8a;
-  
-  --secondary: #10b981; /* Emerald for success/growth */
-  --accent: #f59e0b; /* Amber for highlights */
-  --danger: #ef4444; /* Red for alerts */
-  
-  /* Dark Mode Palette */
-  --bg-main: #020617;
-  --bg-sidebar: #0f172a;
-  --surface: rgba(30, 41, 59, 0.7);
+  /*
+   * Paleta alineada a la sección Carreras del sitio UTC (captura de referencia):
+   * verde institucional oscuro, blanco, texto secundario gris y radios suaves.
+   */
+  --utc-brand: #003d33;
+  --utc-brand-hover: #004d42;
+  --utc-brand-deep: #002b24;
+  --utc-on-brand: #ffffff;
+  --utc-page-bg: #ffffff;
+  --utc-breadcrumb: #757575;
+  --utc-border-subtle: #dde8e5;
+  --utc-radius-sm: 10px;
+  --utc-radius-md: 12px;
+  --utc-radius-lg: 15px;
+  --utc-radius-panel: 15px;
+
+  /* Escala “primary” derivada del verde marca (botones, enlaces, acentos) */
+  --utc-primary-50: #ecf6f4;
+  --utc-primary-100: #c5e8e0;
+  --utc-primary-200: #9dd4c8;
+  --utc-primary-500: #0a5c4e;
+  --utc-primary-600: #003d33;
+  --utc-primary-900: #001a16;
+
+  --utc-highlight-bg: rgba(0, 61, 51, 0.08);
+  --utc-highlight-text: #003d33;
+
+  --utc-green-500: #148f5c;
+  --utc-green-600: #0f7a50;
+  --utc-green-700: #0a5c3d;
+
+  --utc-yellow-500: #c9a227;
+  --utc-gray-200: #e5e7eb;
+  --utc-gray-600: #4b5563;
+  --utc-gray-700: #374151;
+  --utc-gray-800: #1f2937;
+  --utc-gray-900: #1a1a1a;
+  --utc-slate-400: #94a3b8;
+  --utc-red-500: #c62828;
+  --utc-orange-500: #d46213;
+  --utc-orange-600: #b4530e;
+
+  --primary-50: var(--utc-primary-50);
+  --primary-100: var(--utc-primary-100);
+  --primary-500: var(--utc-primary-500);
+  --primary-600: var(--utc-primary-600);
+  --primary-900: var(--utc-primary-900);
+
+  --inst-green-600: var(--utc-green-600);
+  --inst-green-700: var(--utc-green-700);
+  --secondary: var(--utc-green-500);
+  --accent: var(--utc-yellow-500);
+  --danger: var(--utc-red-500);
+
+  /* Modo oscuro: fondo muy oscuro con acentos verde marca */
+  --bg-main: #0a1211;
+  --bg-sidebar: var(--utc-brand);
+  --surface: rgba(14, 26, 24, 0.94);
   --glass-blur: blur(16px);
-  --nav-active-bg: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(37, 99, 235, 0.05));
-  --nav-active-text: var(--primary-100);
-  --badge-primary-bg: rgba(37, 99, 235, 0.1);
-  --badge-primary-text: var(--primary-100);
-  --badge-success-bg: rgba(16, 185, 129, 0.1);
-  --badge-success-text: var(--secondary);
-  --text-light: #f8fafc;
-  --bg-dark: #0f172a;
-  --bg-darker: #020617;
-  --surface-dark: rgba(30, 41, 59, 0.7);
+  --nav-active-bg: rgba(255, 255, 255, 0.12);
+  --nav-active-text: var(--utc-on-brand);
+  --badge-primary-bg: rgba(0, 61, 51, 0.35);
+  --badge-primary-text: #c5e8e0;
+  --badge-success-bg: rgba(20, 143, 92, 0.2);
+  --badge-success-text: #7fe0b5;
+  --text-light: #f4faf8;
+  --bg-dark: #0f1c1a;
+  --bg-darker: #050a09;
   --surface-border: rgba(255, 255, 255, 0.1);
-  --surface-hover: rgba(51, 65, 85, 0.8);
-  
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  
+  --surface-hover: rgba(255, 255, 255, 0.08);
+
+  --text-main: #f0f4f3;
+  --text-muted: #8fa9a3;
+
+  --utc-primary-soft: rgba(0, 61, 51, 0.35);
+  --utc-primary-soft-strong: rgba(0, 77, 66, 0.9);
+  --utc-green-soft: rgba(20, 143, 92, 0.18);
+  --utc-green-soft-strong: rgba(20, 143, 92, 0.85);
+  --utc-green-active-bg: rgba(255, 255, 255, 0.14);
+  --utc-green-active-bg-light: rgba(255, 255, 255, 0.1);
+  --utc-logo-box-bg: rgba(255, 255, 255, 0.12);
+  --utc-yellow-soft: rgba(201, 162, 39, 0.15);
+  --utc-yellow-soft-strong: rgba(201, 162, 39, 0.85);
+  --utc-primary-900-soft: rgba(0, 26, 22, 0.45);
+  --utc-primary-900-soft-strong: rgba(0, 61, 51, 0.9);
+  --utc-slate-soft: rgba(148, 163, 184, 0.12);
+
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Clase en <html> (document.documentElement); las variables heredan a body y la app. */
 .light-theme {
-  --bg-main: #f8fafc;
-  --bg-sidebar: #ffffff;
-  --surface: #ffffff;
-  --surface-border: #e2e8f0;
-  --surface-hover: #f1f5f9;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
+  --bg-main: var(--utc-page-bg);
+  --bg-sidebar: var(--utc-brand);
+  --surface: var(--utc-page-bg);
+  --surface-border: var(--utc-border-subtle);
+  --surface-hover: rgba(0, 61, 51, 0.06);
+  --text-main: var(--utc-gray-900);
+  --text-muted: var(--utc-breadcrumb);
   --glass-blur: none;
-  --nav-active-bg: rgba(37, 99, 235, 0.1);
-  --nav-active-text: #2563eb;
-  --badge-primary-bg: rgba(37, 99, 235, 0.1);
-  --badge-primary-text: #2563eb;
-  --badge-success-bg: rgba(16, 185, 129, 0.1);
-  --badge-success-text: #10b981;
-  --text-light: #0f172a;
+  --nav-active-bg: rgba(255, 255, 255, 0.14);
+  --nav-active-text: var(--utc-on-brand);
+  --badge-primary-bg: var(--utc-highlight-bg);
+  --badge-primary-text: var(--utc-highlight-text);
+  --badge-success-bg: #ecf8f4;
+  --badge-success-text: var(--utc-green-700);
+  --text-light: var(--utc-gray-900);
+  --bg-darker: #f3f6f5;
+  --utc-primary-soft: rgba(0, 61, 51, 0.1);
+  --utc-primary-soft-strong: rgba(0, 61, 51, 0.82);
+  --utc-green-active-bg: rgba(255, 255, 255, 0.14);
+  --utc-green-active-bg-light: rgba(255, 255, 255, 0.1);
+  --utc-logo-box-bg: rgba(255, 255, 255, 0.15);
 }
 
 * {
@@ -64,9 +126,9 @@
 body {
   font-family: var(--font-body);
   background-color: var(--bg-main);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(0, 61, 51, 0.14) 0px, transparent 45%),
+    radial-gradient(at 100% 100%, rgba(0, 61, 51, 0.1) 0px, transparent 45%);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
@@ -89,14 +151,22 @@ h1, h2, h3, h4, h5, h6 {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--surface-border);
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border-radius: var(--utc-radius-panel);
+  box-shadow: 0 8px 32px rgba(0, 61, 51, 0.08);
   transition: var(--transition);
 }
 
+.light-theme .glass-panel {
+  box-shadow: 0 8px 28px rgba(0, 61, 51, 0.06);
+}
+
 .glass-panel:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(0, 61, 51, 0.15);
+  box-shadow: 0 12px 36px rgba(0, 61, 51, 0.12);
+}
+
+.light-theme .glass-panel:hover {
+  border-color: var(--utc-border-subtle);
 }
 
 .btn {
@@ -105,7 +175,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
+  border-radius: var(--utc-radius-md);
   font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
@@ -115,14 +185,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
-  color: white;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  background: linear-gradient(180deg, var(--utc-brand-hover) 0%, var(--utc-brand) 100%);
+  color: var(--utc-on-brand);
+  box-shadow: 0 4px 14px rgba(0, 61, 51, 0.35);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 61, 51, 0.45);
 }
 
 .btn-outline {
@@ -133,19 +203,30 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-outline:hover {
   background: var(--surface-hover);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(0, 61, 51, 0.25);
+}
+
+.light-theme .btn-outline:hover {
+  border-color: var(--utc-brand);
 }
 
 /* Typography */
 .text-gradient {
-  background: linear-gradient(135deg, #fff, #94a3b8);
+  background: linear-gradient(135deg, var(--text-light), var(--utc-slate-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.light-theme .text-gradient {
+  background: linear-gradient(135deg, var(--utc-brand) 0%, var(--utc-primary-500) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-primary {
-  background: linear-gradient(135deg, var(--primary-100), var(--primary-500));
+  background: linear-gradient(135deg, var(--primary-100), var(--primary-600));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -164,24 +245,28 @@ h1, h2, h3, h4, h5, h6 {
 .badge-success {
   background: var(--badge-success-bg);
   color: var(--badge-success-text);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(20, 143, 92, 0.28);
 }
 
 .badge-primary {
   background: var(--badge-primary-bg);
   color: var(--badge-primary-text);
-  border: 1px solid rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(0, 61, 51, 0.2);
+}
+
+.light-theme .badge-primary {
+  border-color: rgba(0, 61, 51, 0.18);
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, var(--accent), #d97706);
-  color: white;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  background: linear-gradient(135deg, var(--utc-orange-500), var(--utc-orange-600));
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(180, 83, 14, 0.28);
 }
 
 .btn-accent:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 6px 20px rgba(180, 83, 14, 0.38);
 }
 
 .btn:disabled {
@@ -189,6 +274,18 @@ h1, h2, h3, h4, h5, h6 {
   cursor: not-allowed;
   transform: none !important;
   box-shadow: none !important;
+}
+
+/* Barra tipo “DIRECCIÓN EN CIENCIAS…” del sitio (reutilizable en títulos de sección) */
+.utc-section-bar {
+  background: var(--utc-brand);
+  color: var(--utc-on-brand);
+  padding: 0.75rem 1.1rem;
+  border-radius: var(--utc-radius-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
 }
 
 /* Scrollbar styling */
@@ -200,9 +297,16 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--bg-darker);
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: rgba(0, 61, 51, 0.45);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: rgba(0, 61, 51, 0.65);
+}
+
+.light-theme ::-webkit-scrollbar-thumb {
+  background: rgba(0, 61, 51, 0.28);
+}
+.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 61, 51, 0.42);
 }

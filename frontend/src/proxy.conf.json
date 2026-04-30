@@ -1,0 +1,10 @@
+{
+  "/backend-api": {
+    "target": "http://localhost",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/backend-api": "/HACKATHON-26/backend"
+    }
+  }
+}

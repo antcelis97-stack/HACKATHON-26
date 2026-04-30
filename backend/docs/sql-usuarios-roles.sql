@@ -1,0 +1,15 @@
+-- =============================================================================
+-- ⚠️ DEPRECADO - NO USAR
+-- =============================================================================
+-- Este archivo ha sido reemplazado por db/002_seed_completo.sql
+-- El nuevo archivo contiene datos reales de la UTC con:
+-- - 38 adscripciones reales del SIIA
+-- - 60 bienes con NFC, barcode, QR
+-- - 18 aulas en 5 edificios
+-- - 50+ artículos del catálogo clasificado
+-- - 4 roles independientes (incluyendo Director)
+-- - Usuarios con hashes bcrypt reales
+--
+-- Para ejecutar el seed completo:
+--   psql -h localhost -U postgres -d siest -f db/002_seed_completo.sql
+-- =============================================================================

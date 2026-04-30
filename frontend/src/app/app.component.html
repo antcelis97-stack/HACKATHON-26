@@ -1,6 +1,6 @@
 <ng-container *ngIf="isAuthenticated; else loginView">
 <div class="app-layout" [class.sidebar-open]="isSidebarOpen">
-  <header class="mobile-header glass-panel">
+  <header class="mobile-header">
     <div class="mobile-logo">
       <img src="assets/UTClogin.jpg" alt="Logo" style="height: 32px; border-radius: 4px;">
       <span>VinculaUT</span>
@@ -45,10 +45,32 @@
         <i class="bi bi-buildings"></i>
         <span>Sector Empresarial</span>
       </a>
-      <a class="nav-item" *ngIf="canAccessView('analitica')" [class.active]="currentView === 'analitica'" (click)="switchView('analitica')">
-        <i class="bi bi-clipboard2-data"></i>
-        <span>Analítica y Reportes</span>
-      </a>
+      <div class="nav-analitica-group" *ngIf="canAccessView('analitica')">
+        <button type="button" class="nav-item nav-analitica-parent" [class.active]="currentView === 'analitica'"
+          (click)="toggleAnaliticaReportesMenu($event)">
+          <i class="bi bi-clipboard2-data"></i>
+          <span class="nav-analitica-parent-text">Analítica y Reportes</span>
+          <i class="bi nav-analitica-chevron" [class.bi-chevron-down]="!reportesMenuOpen" [class.bi-chevron-up]="reportesMenuOpen"></i>
+        </button>
+        <div class="nav-reportes-submenu" *ngIf="reportesMenuOpen" (click)="$event.stopPropagation()">
+          <button type="button" class="nav-subitem" [class.nav-subitem-active]="currentView === 'analitica' && analiticaPanelId === 'resumen'"
+            (click)="seleccionarReporteDesdeSidebar('resumen')">
+            <i class="bi bi-speedometer2"></i><span>Resumen (gráficas)</span>
+          </button>
+          <button type="button" class="nav-subitem" [class.nav-subitem-active]="currentView === 'analitica' && analiticaPanelId === 'egresados_carrera'"
+            (click)="seleccionarReporteDesdeSidebar('egresados_carrera')">
+            <i class="bi bi-mortarboard"></i><span>Egresados por carrera</span>
+          </button>
+          <button type="button" class="nav-subitem" [class.nav-subitem-active]="currentView === 'analitica' && analiticaPanelId === 'postulaciones_prueba'"
+            (click)="seleccionarReporteDesdeSidebar('postulaciones_prueba')">
+            <i class="bi bi-inboxes"></i><span>Postulaciones (prueba)</span>
+          </button>
+          <button type="button" class="nav-subitem" [class.nav-subitem-active]="currentView === 'analitica' && analiticaPanelId === 'vacantes_prueba'"
+            (click)="seleccionarReporteDesdeSidebar('vacantes_prueba')">
+            <i class="bi bi-building-check"></i><span>Vacantes por empresa (prueba)</span>
+          </button>
+        </div>
+      </div>
     </nav>
 
     <div class="sidebar-footer">
@@ -176,9 +198,14 @@
               </div>
             </div>
           </div>
-          <div class="profile-actions" style="gap: 1rem; display: flex;">
-            <button class="btn btn-primary" (click)="descargarPDF()"><i class="bi bi-file-earmark-pdf"></i> Exportar Reporte</button>
+          <div class="profile-actions profile-actions-wrap">
+            <input type="file" #cvInput style="display: none;" (change)="onCvSelected($event)" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            <button type="button" class="btn btn-primary" (click)="descargarPDF()"><i class="bi bi-file-earmark-pdf"></i> Exportar Reporte</button>
+            <button type="button" class="btn btn-outline" (click)="cvInput.click()" title="PDF, Word">
+              <i class="bi bi-cloud-upload"></i> Subir CV / Actualizar CV
+            </button>
             <button
+              type="button"
               class="btn"
               [class.btn-accent]="!hasCompletedSurvey"
               [class.btn-outline]="hasCompletedSurvey"
@@ -188,6 +215,7 @@
               <i class="bi" [class.bi-clipboard-check]="!hasCompletedSurvey" [class.bi-check-all]="hasCompletedSurvey"></i>
               {{ hasCompletedSurvey ? 'Evaluación Completada' : 'Realizar Evaluación' }}
             </button>
+            <span class="cv-nombre-guardado" *ngIf="cvNombreArchivo">CV: {{ cvNombreArchivo }}</span>
           </div>
         </div>
 
@@ -228,7 +256,7 @@
                       <span class="eval-title">Pruebas Proyectivas</span>
                       <span class="eval-score">88/100</span>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 88%; background: #8b5cf6;"></div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 88%; background: var(--utc-brand);"></div></div>
                     <p class="eval-desc">Estabilidad emocional robusta. Perfil de liderazgo identificado.</p>
                   </div>
                 </div>
@@ -295,8 +323,15 @@
                 </button>
               </div>
 
-              <div *ngIf="inegiError" style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; margin-bottom: 1rem; border-radius: 4px;">
-                <p style="color: #ef4444; margin: 0;"><i class="bi bi-exclamation-triangle"></i> {{ inegiError }}</p>
+              <div *ngIf="inegiUsingMock" style="padding: 0.85rem 1rem; background: rgba(201, 162, 39, 0.12); border-left: 4px solid var(--accent); margin-bottom: 1rem; border-radius: 4px;">
+                <p style="color: var(--text-main); margin: 0; font-size: 0.9rem;">
+                  <i class="bi bi-info-circle"></i>
+                  <strong>Modo demostración:</strong> la respuesta no vino marcada como INEGI oficial (revisa token en .env del backend o el mensaje de error arriba).
+                </p>
+              </div>
+
+              <div *ngIf="inegiError" style="padding: 1rem; background: rgba(198, 40, 40, 0.08); border-left: 4px solid var(--danger); margin-bottom: 1rem; border-radius: 4px;">
+                <p style="color: var(--danger); margin: 0;"><i class="bi bi-exclamation-triangle"></i> {{ inegiError }}</p>
               </div>
 
               <div class="table-responsive" *ngIf="inegiResults.length > 0" style="max-height: 360px; overflow-y: auto; border-radius: 8px;">
@@ -309,7 +344,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let empresa of inegiResults" [style.background]="selectedEmpresa === empresa ? 'rgba(37, 99, 235, 0.1)' : 'transparent'">
+                    <tr *ngFor="let empresa of inegiResults" [style.background]="selectedEmpresa === empresa ? 'rgba(0, 61, 51, 0.08)' : 'transparent'">
                       <td>
                         <strong style="font-weight: 600;">{{ empresa.Nombre }}</strong><br>
                         <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="bi bi-geo-alt"></i> {{ empresa.Municipio }}, {{ empresa.Entidad }}</span>
@@ -332,7 +367,7 @@
             </div>
 
             <div style="flex: 1; min-width: 320px; display: flex; flex-direction: column;">
-              <div class="glass-panel" style="border: 1px solid var(--primary-500); padding: 1rem; border-radius: 12px; background: rgba(37, 99, 235, 0.03); flex: 1; display: flex; flex-direction: column;">
+              <div class="glass-panel" style="border: 1px solid var(--utc-border-subtle); padding: 1rem; border-radius: var(--utc-radius-md); background: rgba(0, 61, 51, 0.03); flex: 1; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.75rem;">
                   <div style="flex: 1; padding-right: 0.5rem;">
                     <h5 style="margin: 0; color: var(--text-light); font-size: 1.1rem;"><i class="bi bi-map-fill"></i> {{ selectedEmpresa?.Nombre }}</h5>
@@ -341,7 +376,7 @@
                     *ngIf="selectedEmpresa?.Nombre !== 'Tepic, Nayarit (Vista General)'"
                     (click)="trazarRutaEnMapa()"
                     class="btn btn-primary small"
-                    style="background-color: #10b981; border-color: #10b981; flex-shrink: 0;"
+                    style="background-color: var(--secondary); border-color: var(--secondary); flex-shrink: 0;"
                   >
                     <i class="bi bi-sign-turn-right-fill"></i> Ver Ruta
                   </button>
@@ -405,45 +440,151 @@
         <div class="profile-header glass-panel">
           <div>
             <h2 class="text-gradient">Analítica y Reportes Estratégicos</h2>
-            <p style="color: var(--text-muted);">Tableros de control para la toma de decisiones institucionales</p>
+            <p style="color: var(--text-muted); margin-bottom: 0.25rem;">Tableros de control para la toma de decisiones institucionales</p>
+            <p class="analitica-panel-badge"><i class="bi bi-bookmark-fill"></i> {{ tituloAnaliticaPanelActual() }}</p>
           </div>
           <button class="btn btn-outline" (click)="descargarPDF()"><i class="bi bi-download"></i> Descargar PDF</button>
         </div>
 
-        <div class="charts-grid">
-          <div class="chart-card glass-panel">
-            <div class="card-header">
-              <h4><i class="bi bi-bar-chart-steps"></i> Ranking de Competencias Demandadas</h4>
+        <ng-container *ngIf="analiticaPanelId === 'resumen'">
+          <div class="charts-grid">
+            <div class="chart-card glass-panel">
+              <div class="card-header">
+                <h4><i class="bi bi-bar-chart-steps"></i> Ranking de Competencias Demandadas</h4>
+              </div>
+              <div class="card-body chart-container">
+                <canvas id="skillsChart"></canvas>
+              </div>
             </div>
-            <div class="card-body chart-container">
-              <canvas id="skillsChart"></canvas>
+
+            <div class="chart-card glass-panel">
+              <div class="card-header">
+                <h4><i class="bi bi-pie-chart-fill"></i> Estatus de Inserción Laboral</h4>
+              </div>
+              <div class="card-body chart-container">
+                <canvas id="placementChart"></canvas>
+              </div>
             </div>
           </div>
 
-          <div class="chart-card glass-panel">
-            <div class="card-header">
-              <h4><i class="bi bi-pie-chart-fill"></i> Estatus de Inserción Laboral</h4>
+          <div class="kpi-grid" style="margin-top: 1.5rem;">
+            <div class="kpi-card glass-panel">
+              <div class="kpi-icon info"><i class="bi bi-clock-history"></i></div>
+              <div class="kpi-info">
+                <span class="kpi-label">Tiempo Promedio Cobertura</span>
+                <h3 class="kpi-value">14 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">días</span></h3>
+              </div>
             </div>
-            <div class="card-body chart-container">
-              <canvas id="placementChart"></canvas>
+            <div class="kpi-card glass-panel">
+              <div class="kpi-icon warning"><i class="bi bi-journal-check"></i></div>
+              <div class="kpi-info">
+                <span class="kpi-label">Convenios por Vencer</span>
+                <h3 class="kpi-value">3 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">empresas</span></h3>
+              </div>
             </div>
+          </div>
+        </ng-container>
+
+        <!-- Reporte: egresados por carrera -->
+        <div class="table-section glass-panel reporte-inst-panel" *ngIf="analiticaPanelId === 'egresados_carrera'" style="margin-top: 1.25rem;">
+          <div class="card-header">
+            <div>
+              <h4><i class="bi bi-mortarboard"></i> Egresados por carrera</h4>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                Intenta cargar desde PostgreSQL; si no hay datos o falla la conexión, se muestran filas de ejemplo.
+              </p>
+            </div>
+            <button type="button" class="btn btn-outline small" (click)="cargarReporteEgresadosPorCarrera()">
+              <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </button>
+          </div>
+          <div class="reporte-banner-prueba" *ngIf="reporteEgresadosCarreraUsaPrueba && !reporteEgresadosCarreraLoading">
+            <i class="bi bi-info-circle"></i> Mostrando <strong>datos de prueba</strong> (API vacía o no disponible).
+          </div>
+          <div class="table-responsive" style="padding: 0 1rem 1rem 1rem;">
+            <p *ngIf="reporteEgresadosCarreraLoading" style="color: var(--text-muted); text-align: center; padding: 1.5rem;">Cargando reporte...</p>
+            <table class="data-table" *ngIf="!reporteEgresadosCarreraLoading && reporteEgresadosCarreraFilas.length > 0">
+              <thead>
+                <tr>
+                  <th>Carrera</th>
+                  <th>Total egresados</th>
+                  <th>Con exámenes completos</th>
+                  <th>% Exámenes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of reporteEgresadosCarreraFilas">
+                  <td>{{ r.carrera }}</td>
+                  <td>{{ r.total_egresados }}</td>
+                  <td>{{ r.con_examenes_completos }}</td>
+                  <td>{{ porcentajeExamenesCarrera(r) }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        
-        <div class="kpi-grid" style="margin-top: 1.5rem;">
-          <div class="kpi-card glass-panel">
-            <div class="kpi-icon info"><i class="bi bi-clock-history"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Tiempo Promedio Cobertura</span>
-              <h3 class="kpi-value">14 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">días</span></h3>
+
+        <!-- Reporte de prueba: postulaciones -->
+        <div class="table-section glass-panel reporte-inst-panel" *ngIf="analiticaPanelId === 'postulaciones_prueba'" style="margin-top: 1.25rem;">
+          <div class="card-header">
+            <div>
+              <h4><i class="bi bi-inboxes"></i> Postulaciones por estatus</h4>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                Datos de prueba alineados al enum <code>estatus_postulacion</code> de la BD (conexión pendiente).
+              </p>
             </div>
           </div>
-          <div class="kpi-card glass-panel">
-            <div class="kpi-icon warning"><i class="bi bi-journal-check"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Convenios por Vencer</span>
-              <h3 class="kpi-value">3 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">empresas</span></h3>
+          <div class="reporte-banner-prueba">
+            <i class="bi bi-flask"></i> Reporte de demostración — no proviene de la base de datos.
+          </div>
+          <div class="table-responsive" style="padding: 0 1rem 1rem 1rem;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Estatus</th>
+                  <th>Total postulaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of reportePruebaPostulaciones">
+                  <td>{{ formatEstatusPostulacion(p.estatus) | titlecase }}</td>
+                  <td>{{ p.total }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reporte de prueba: vacantes -->
+        <div class="table-section glass-panel reporte-inst-panel" *ngIf="analiticaPanelId === 'vacantes_prueba'" style="margin-top: 1.25rem;">
+          <div class="card-header">
+            <div>
+              <h4><i class="bi bi-building-check"></i> Vacantes por empresa</h4>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                Datos de prueba: vacantes activas y volumen de postulaciones simulado.
+              </p>
             </div>
+          </div>
+          <div class="reporte-banner-prueba">
+            <i class="bi bi-flask"></i> Reporte de demostración — no proviene de la base de datos.
+          </div>
+          <div class="table-responsive" style="padding: 0 1rem 1rem 1rem;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Vacantes activas</th>
+                  <th>Postulaciones (totales)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let v of reportePruebaVacantes">
+                  <td>{{ v.empresa }}</td>
+                  <td>{{ v.vacantes_activas }}</td>
+                  <td>{{ v.postulaciones_totales }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </ng-container>
