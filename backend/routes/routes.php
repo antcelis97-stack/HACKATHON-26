@@ -94,15 +94,25 @@ Flight::route('GET /', function() {
     ]));
 });
 
-// Login
-Flight::route('POST /api/v1/login', function() {
-    \app\controllers\LoginController::login();
+// Inicio de sesión
+Flight::route('POST /api/v1/iniciar-sesion', function() {
+    $controller = new \App\Controllers\LoginController();
+    $controller->iniciarSesion();
 });
 
-// Refresh token
+// Refresh token (Renovar sesión)
 Flight::route('POST /api/v1/refresh-token', function() {
-    \App\controllers\EjemploController::refreshToken();
+    if (!authMiddleware()) return; // Solo usuarios con token válido pueden renovar
+    $controller = new \App\Controllers\LoginController();
+    $controller->refreshToken();
 });
+
+// Cerrar sesión
+Flight::route('POST /api/v1/cerrar-sesion', function() {
+    $controller = new \App\Controllers\LoginController();
+    $controller->cerrarSesion();
+});
+
 
 // Listar empleados (público - sin auth)
 Flight::route('GET /api/v1/empleados', function() {

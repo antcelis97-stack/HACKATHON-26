@@ -11,3 +11,5 @@ test_gemini.php
 .gga
 /docs/design-fotos-nfc.md
 /docs/google-drive-setup.md
+/config/google-key.json
+.vscode/
