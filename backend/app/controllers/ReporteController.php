@@ -46,14 +46,14 @@ class ReporteController extends BaseController {
         $stmt = $this->db->query("
             SELECT 
                 e.razon_social,
-                e.url_convenio_drive IS NOT NULL as tiene_convenio,
+                (SELECT COUNT(*) FROM convenios c WHERE c.id_empresa = e.id_empresa AND c.estatus = 'activo') > 0 as tiene_convenio_activo,
                 COUNT(v.id_vacante) as vacantes_publicadas,
                 AVG(v.min_psicometrico) as promedio_demanda_psico,
                 AVG(v.min_tecnico) as promedio_demanda_tecnica
             FROM empresas e
             LEFT JOIN vacantes v ON e.id_empresa = v.id_empresa
             WHERE e.estado = TRUE
-            GROUP BY e.id_empresa, e.razon_social, e.url_convenio_drive
+            GROUP BY e.id_empresa, e.razon_social
         ");
         return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
     }
@@ -94,6 +94,36 @@ class ReporteController extends BaseController {
                 LEFT JOIN postulaciones p ON e.cve_alumno = p.cve_alumno
                 GROUP BY c.id_carrera, c.nombre_carrera
                 ORDER BY porcentaje_insercion DESC
+            ");
+            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Monitoreo de Estatus de Convenios: Clasificación estratégica (Tabla Normalizada)
+     */
+    public function obtenerEstatusConvenios() {
+        try {
+            $stmt = $this->db->query("
+                SELECT 
+                    e.id_empresa,
+                    e.razon_social,
+                    c.url_archivo_drive,
+                    c.fecha_vencimiento,
+                    c.estatus as estatus_convenio,
+                    c.comentarios
+                FROM empresas e
+                LEFT JOIN convenios c ON e.id_empresa = c.id_empresa
+                WHERE e.estado = TRUE
+                ORDER BY 
+                    CASE c.estatus 
+                        WHEN 'en_revision' THEN 1 
+                        WHEN 'pendiente' THEN 2 
+                        WHEN 'activo' THEN 3 
+                        ELSE 4 
+                    END
             ");
             return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
         } catch (\Exception $e) {

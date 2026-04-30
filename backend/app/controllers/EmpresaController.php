@@ -53,16 +53,23 @@ class EmpresaController extends BaseController {
                 $folderId
             );
 
-            // 3. Crear la Empresa vinculada con la URL de Drive
-            $stmtEmp = $this->db->prepare("INSERT INTO empresas (id_usuario, id_denue, razon_social, url_convenio_drive) VALUES (?, ?, ?, ?)");
+            // 3. Crear la Empresa básica
+            $stmtEmp = $this->db->prepare("INSERT INTO empresas (id_usuario, id_denue, razon_social) VALUES (?, ?, ?)");
             $stmtEmp->execute([
                 $id_usuario,
                 $data['id_denue'] ?? null,
-                $data['razon_social'],
-                $resultadoDrive['url']
+                $data['razon_social']
             ]);
+            $id_empresa = $this->db->lastInsertId();
 
-            // 4. Información de contacto inicial
+            // 4. Registrar el Convenio inicial en la nueva tabla
+            $stmtConv = $this->db->prepare("
+                INSERT INTO convenios (id_empresa, url_archivo_drive, estatus) 
+                VALUES (?, ?, 'en_revision')
+            ");
+            $stmtConv->execute([$id_empresa, $resultadoDrive['url']]);
+
+            // 5. Información de contacto inicial
             if (!empty($data['email']) || !empty($data['telefono'])) {
                 $stmtCont = $this->db->prepare("INSERT INTO usuario_contacto (id_usuario, email, telefono, direccion) VALUES (?, ?, ?, ?)");
                 $stmtCont->execute([
@@ -75,8 +82,9 @@ class EmpresaController extends BaseController {
 
             $this->db->commit();
             return Flight::json([
-                'mensaje' => 'Empresa registrada y convenio subido con éxito',
+                'mensaje' => 'Empresa registrada y convenio enviado a revisión',
                 'id_usuario' => $id_usuario,
+                'id_empresa' => $id_empresa,
                 'url_convenio' => $resultadoDrive['url']
             ], 201);
 

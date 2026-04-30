@@ -54,7 +54,19 @@ CREATE TABLE empresas (
  id_usuario INTEGER UNIQUE REFERENCES usuarios(id_usuario),
  id_denue VARCHAR(50), 
  razon_social VARCHAR(150) NOT NULL,
- url_convenio_drive TEXT,
+ fecha_registro DATE DEFAULT CURRENT_DATE,
+ hora_registro TIME DEFAULT CURRENT_TIME,
+ estado BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE convenios (
+ id_convenio SERIAL PRIMARY KEY,
+ id_empresa INTEGER REFERENCES empresas(id_empresa) ON DELETE CASCADE,
+ url_archivo_drive TEXT,
+ fecha_inicio DATE,
+ fecha_vencimiento DATE,
+ estatus VARCHAR(30) DEFAULT 'pendiente', -- pendiente, en_revision, activo, rechazado, vencido
+ comentarios TEXT,
  fecha_registro DATE DEFAULT CURRENT_DATE,
  hora_registro TIME DEFAULT CURRENT_TIME,
  estado BOOLEAN DEFAULT TRUE

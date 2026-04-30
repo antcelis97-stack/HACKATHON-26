@@ -134,6 +134,11 @@ Flight::route('GET /api/v1/reportes/insercion/carrera', function() use ($reporte
     $reporte->obtenerInsercionLaboralPorCarrera();
 });
 
+Flight::route('GET /api/v1/reportes/convenios/estatus', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->obtenerEstatusConvenios();
+});
+
 Flight::route('GET /api/v1/reportes/radar/@usuarioId', function($usuarioId) use ($reporte) {
     if (!authMiddleware()) return;
     $reporte->getRadarCompetencias($usuarioId);
