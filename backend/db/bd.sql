@@ -13,6 +13,16 @@ CREATE TABLE usuarios (
  estado BOOLEAN DEFAULT TRUE
 );
 
+CREATE TABLE usuario_contacto (
+ id_contacto SERIAL PRIMARY KEY,
+ id_usuario INTEGER UNIQUE REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+ direccion TEXT,
+ email VARCHAR(100),
+ telefono VARCHAR(20),
+ fecha_registro DATE DEFAULT CURRENT_DATE,
+ estado BOOLEAN DEFAULT TRUE
+);
+
 CREATE TABLE carreras (
  id_carrera SERIAL PRIMARY KEY,
  nombre_carrera VARCHAR(100) NOT NULL,
