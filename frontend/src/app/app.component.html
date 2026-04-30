@@ -71,6 +71,18 @@
   <!-- Main Content Area -->
   <main class="main-content">
     
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 style="font-size: 1.2rem; font-weight: 600;">{{ currentView === 'dashboard' ? 'Panel Institucional' : currentView === 'profile' ? 'Perfil del Egresado' : 'Gestión de Vinculación' }}</h2>
+      </div>
+      <div class="topbar-actions">
+        <div class="search-bar">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Buscar egresado, empresa o vacante...">
+        </div>
+      </div>
+    </div>
+
     <!-- VIEWS CONTAINER -->
     <div class="dashboard-content">
 

@@ -1,10 +1,10 @@
 :root {
-  /* Official UT de la Costa Palette */
-  --primary-50: #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-500: #3b82f6; /* Azul Institucional */
-  --primary-600: #2563eb;
-  --primary-700: #1d4ed8;
+  /* Colores Oficiales UT de la Costa (Navy & Blue) */
+  --primary-50: #f0f4f8;
+  --primary-100: #d9e2ec;
+  --primary-500: #003366; /* Navy Institucional */
+  --primary-600: #002244;
+  --primary-700: #102a43;
   
   --secondary: #10b981;
   --accent: #f59e0b;
