@@ -1,1 +1,13 @@
 /vendor/
+.env
+token.json
+auth_code.txt
+composer.phar
+run_gga.php
+test_gemini.php
+*.ps1
+*.bat
+*.sh
+.gga
+/docs/design-fotos-nfc.md
+/docs/google-drive-setup.md
