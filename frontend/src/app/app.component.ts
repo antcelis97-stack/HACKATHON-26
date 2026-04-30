@@ -190,11 +190,11 @@ export class AppComponent implements AfterViewInit {
 
   private applyTheme() {
     if (!this.isLightTheme) {
-      document.body.parentElement?.classList.add('dark-theme');
-      document.body.parentElement?.classList.remove('light-theme');
+      document.body.classList.add('dark-theme');
+      document.body.classList.remove('light-theme');
     } else {
-      document.body.parentElement?.classList.remove('dark-theme');
-      document.body.parentElement?.classList.remove('light-theme');
+      document.body.classList.remove('dark-theme');
+      document.body.classList.remove('light-theme');
     }
   }
 

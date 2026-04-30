@@ -33,7 +33,7 @@
 }
 
 /* Dark Mode (Optional adjustment for official look) */
-.dark-theme {
+body.dark-theme, .dark-theme {
   --bg-main: #111827;
   --bg-sidebar: #1f2937;
   --surface: #1f2937;
