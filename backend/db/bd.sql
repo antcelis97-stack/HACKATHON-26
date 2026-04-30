@@ -124,3 +124,9 @@ CREATE TABLE postulaciones (
  hora_registro TIME DEFAULT CURRENT_TIME,
  estado BOOLEAN DEFAULT TRUE
 );
+
+-- =============================================================================
+-- DATOS DE PRUEBA
+-- =============================================================================
+INSERT INTO carreras (nombre_carrera) VALUES ('Ingeniería en Software'), ('Licenciatura en Administración');
+INSERT INTO tipos_evaluacion (nombre_tipo) VALUES ('Psicométrica'), ('Cognitiva'), ('Técnica'), ('Proyectiva');

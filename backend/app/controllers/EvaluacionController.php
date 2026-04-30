@@ -7,7 +7,7 @@ use PDO;
 class EvaluacionController extends BaseController {
     /**
      * POST /api/v1/evaluaciones
-     * Registrar un resultado de evaluación individual
+     * Registrar un resultado de evaluación individual (Puntaje Total)
      */
     public function saveResultados() {
         $data = $this->getInput();
@@ -24,15 +24,16 @@ class EvaluacionController extends BaseController {
                 DO UPDATE SET puntaje = EXCLUDED.puntaje, fecha_registro = CURRENT_DATE, hora_registro = CURRENT_TIME
             ");
             
-            if ($stmt->execute([
+            $stmt->execute([
                 $data['cve_alumno'], 
                 $data['id_tipo'], 
                 $data['puntaje']
-            ])) {
-                return Flight::json(['mensaje' => 'Evaluación registrada o actualizada con éxito'], 201);
-            }
+            ]);
+
+            return Flight::json(['mensaje' => 'Evaluación registrada o actualizada con éxito'], 201);
+
         } catch (\Exception $e) {
-            return Flight::json(['error' => 'Error al guardar los resultados', 'detalle' => $e->getMessage()], 500);
+            return Flight::json(['error' => 'Error al guardar resultado', 'detalle' => $e->getMessage()], 500);
         }
     }
 }

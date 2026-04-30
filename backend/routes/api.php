@@ -222,9 +222,9 @@ Flight::route('POST /api/v1/empresa/registrar-contratado', function() use ($empr
     $empresa->registrarContratacion();
 });
 
-Flight::route('GET /api/v1/match/talento/@id', function($id) use ($match) {
+Flight::route('GET /api/v1/match/ranking/@id', function($id) use ($match) {
     if (!authMiddleware()) return;
-    $match->matchTalento($id);
+    $match->getRankingByVacante($id);
 });
 
 // =============================================================================
