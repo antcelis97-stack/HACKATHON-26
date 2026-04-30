@@ -146,4 +146,61 @@ class EmpresaController extends BaseController {
             return Flight::json(['error' => 'Error al publicar la vacante', 'detalle' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * POST /api/v1/empresa/registrar-contratado
+     * La empresa formaliza la contratación de un egresado que se postuló
+     */
+    public function registrarContratacion() {
+        $user = Flight::get('user');
+        $data = $this->getInput();
+
+        if (!isset($data['id_postulacion'], $data['puesto'])) {
+            return Flight::json(['error' => 'id_postulacion y puesto son requeridos'], 400);
+        }
+
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Obtener datos de la postulación y verificar propiedad de la empresa
+            $stmtPost = $this->db->prepare("
+                SELECT p.cve_alumno, v.id_empresa 
+                FROM postulaciones p 
+                JOIN vacantes v ON p.id_vacante = v.id_vacante 
+                WHERE p.id_postulacion = ?
+            ");
+            $stmtPost->execute([$data['id_postulacion']]);
+            $postulacion = $stmtPost->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$postulacion) {
+                return Flight::json(['error' => 'Postulación no encontrada'], 404);
+            }
+
+            // 2. Crear registro en contrataciones
+            $stmtCont = $this->db->prepare("
+                INSERT INTO contrataciones (cve_alumno, id_empresa, puesto_asignado, estatus) 
+                VALUES (?, ?, ?, 'activo')
+            ");
+            $stmtCont->execute([
+                $postulacion['cve_alumno'], 
+                $postulacion['id_empresa'], 
+                $data['puesto']
+            ]);
+
+            // 3. Actualizar estatus del egresado
+            $stmtEgr = $this->db->prepare("UPDATE egresados SET estatus_laboral = 'contratado' WHERE cve_alumno = ?");
+            $stmtEgr->execute([$postulacion['cve_alumno']]);
+
+            // 4. Actualizar estatus de la postulación
+            $stmtUpPost = $this->db->prepare("UPDATE postulaciones SET estatus = 'contratado' WHERE id_postulacion = ?");
+            $stmtUpPost->execute([$data['id_postulacion']]);
+
+            $this->db->commit();
+            return Flight::json(['mensaje' => 'Contratación formalizada exitosamente'], 201);
+
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

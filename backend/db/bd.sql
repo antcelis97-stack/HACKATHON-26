@@ -1,7 +1,6 @@
 -- Tipos enumerados para roles y estatus
 CREATE TYPE rol_usuario AS ENUM ('egresado', 'empresa', 'admin');
-CREATE TYPE estatus_postulacion AS ENUM ('postulado', 'en_proceso', 'contratado', 
-'rechazado');
+CREATE TYPE estatus_postulacion AS ENUM ('postulado', 'en_proceso', 'contratado', 'rechazado');
 
 CREATE TABLE usuarios (
  id_usuario SERIAL PRIMARY KEY,
@@ -31,7 +30,6 @@ CREATE TABLE carreras (
  estado BOOLEAN DEFAULT TRUE
 );
 
-;
 CREATE TABLE egresados (
  cve_alumno VARCHAR(20) PRIMARY KEY,
  id_usuario INTEGER UNIQUE REFERENCES usuarios(id_usuario),
@@ -44,6 +42,7 @@ CREATE TABLE egresados (
  url_foto_drive TEXT,
  url_cv_drive TEXT,
  completo_examenes BOOLEAN DEFAULT FALSE,
+ estatus_laboral VARCHAR(20) DEFAULT 'buscando', -- buscando, contratado, independiente
  fecha_registro DATE DEFAULT CURRENT_DATE,
  hora_registro TIME DEFAULT CURRENT_TIME,
  estado BOOLEAN DEFAULT TRUE
@@ -71,6 +70,7 @@ CREATE TABLE convenios (
  hora_registro TIME DEFAULT CURRENT_TIME,
  estado BOOLEAN DEFAULT TRUE
 );
+
 CREATE TABLE vacantes (
  id_vacante SERIAL PRIMARY KEY,
  id_empresa INTEGER REFERENCES empresas(id_empresa) ON DELETE CASCADE,
@@ -86,13 +86,24 @@ CREATE TABLE vacantes (
  estado BOOLEAN DEFAULT TRUE
 );
 
+CREATE TABLE contrataciones (
+    id_contratacion SERIAL PRIMARY KEY,
+    cve_alumno VARCHAR(20) REFERENCES egresados(cve_alumno) ON DELETE CASCADE,
+    id_empresa INTEGER REFERENCES empresas(id_empresa) ON DELETE CASCADE,
+    puesto_asignado VARCHAR(150),
+    fecha_contratacion DATE DEFAULT CURRENT_DATE,
+    estatus VARCHAR(20) DEFAULT 'activo', -- activo, finalizado
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE tipos_evaluacion (
  id_tipo SERIAL PRIMARY KEY,
- nombre_tipo VARCHAR(50) NOT NULL, -- Psicométrica, Cognitiva, etc.
+ nombre_tipo VARCHAR(50) NOT NULL,
  fecha_registro DATE DEFAULT CURRENT_DATE,
  hora_registro TIME DEFAULT CURRENT_TIME,
  estado BOOLEAN DEFAULT TRUE
 );
+
 CREATE TABLE resultados_evaluaciones (
  id_resultado SERIAL PRIMARY KEY,
  cve_alumno VARCHAR(20) REFERENCES egresados(cve_alumno) ON DELETE CASCADE,
@@ -101,9 +112,9 @@ CREATE TABLE resultados_evaluaciones (
  fecha_registro DATE DEFAULT CURRENT_DATE,
  hora_registro TIME DEFAULT CURRENT_TIME,
  estado BOOLEAN DEFAULT TRUE,
- -- Asegura que solo se realice una vez por tipo de examen
  UNIQUE(cve_alumno, id_tipo) 
 );
+
 CREATE TABLE postulaciones (
  id_postulacion SERIAL PRIMARY KEY,
  id_vacante INTEGER REFERENCES vacantes(id_vacante) ON DELETE CASCADE,
@@ -113,38 +124,3 @@ CREATE TABLE postulaciones (
  hora_registro TIME DEFAULT CURRENT_TIME,
  estado BOOLEAN DEFAULT TRUE
 );
-
--- =============================================================================
--- DATOS DE PRUEBA (CONTRASEÑA: password123)
--- =============================================================================
-
--- 1. Usuarios (Hash para 'password123')
-INSERT INTO usuarios (username, password_hash, rol) VALUES 
-('egresado_test', '$2a$12$R9h/cIPz0gi.URQHeNVwCOVuxTkFz/1VYmSGYzYrfwj6JJvVPQU7a', 'egresado'),
-('empresa_test', '$2a$12$R9h/cIPz0gi.URQHeNVwCOVuxTkFz/1VYmSGYzYrfwj6JJvVPQU7a', 'empresa');
-
--- 2. Información de Contacto
-INSERT INTO usuario_contacto (id_usuario, direccion, email, telefono) VALUES 
-(1, 'Calle de las Flores #123, Col. Centro', 'juan.egresado@correo.com', '555-0101'),
-(2, 'Parque Industrial Norte, Bodega 4', 'rh@empresa-tech.com', '555-9090');
-
--- 3. Carreras
-INSERT INTO carreras (nombre_carrera) VALUES 
-('Ingeniería en Software'),
-('Licenciatura en Administración');
-
--- 4. Egresados (Matrícula, Usuario, Carrera, etc.)
-INSERT INTO egresados (cve_alumno, matricula, id_usuario, id_carrera, nombre, apellido_paterno, apellido_materno) VALUES 
-('20240001', 'MAT-20240001', 1, 1, 'Juan', 'Pérez', 'Gómez');
-
--- 5. Empresas (Usuario, DENUE, Razón Social)
-INSERT INTO empresas (id_usuario, id_denue, razon_social) VALUES 
-(2, '1234567890', 'Tech Innovations S.A. de C.V.');
-
--- 6. Tipos de Evaluación
-INSERT INTO tipos_evaluacion (nombre_tipo) VALUES 
-('Psicométrica'),
-('Cognitiva'),
-('Técnica');
-
-

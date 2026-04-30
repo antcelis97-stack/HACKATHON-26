@@ -113,4 +113,46 @@ class EgresadoController extends BaseController {
             return Flight::json(['error' => 'Error al buscar vacantes', 'detalle' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * PATCH /api/v1/egresado/mi-disponibilidad
+     * El egresado actualiza su propio estatus laboral
+     */
+    public function actualizarEstatusLaboral() {
+        $user = Flight::get('user');
+        $data = $this->getInput();
+        
+        if (!isset($data['estatus'])) {
+            return Flight::json(['error' => 'El campo estatus es requerido'], 400);
+        }
+
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Actualizar estatus en la tabla egresados
+            $stmt = $this->db->prepare("UPDATE egresados SET estatus_laboral = ? WHERE id_usuario = ?");
+            $stmt->execute([$data['estatus'], $user->sub]);
+
+            // 2. Si es contratado, registrar en la tabla contrataciones (inserción externa)
+            if ($data['estatus'] === 'contratado' && !empty($data['empresa'])) {
+                $stmtEgresado = $this->db->prepare("SELECT cve_alumno FROM egresados WHERE id_usuario = ?");
+                $stmtEgresado->execute([$user->sub]);
+                $cve_alumno = $stmtEgresado->fetchColumn();
+
+                $stmtCont = $this->db->prepare("
+                    INSERT INTO contrataciones (cve_alumno, puesto_asignado, estatus) 
+                    VALUES (?, ?, 'activo')
+                ");
+                $stmtCont->execute([$cve_alumno, $data['puesto'] ?? 'No especificado']);
+                // Nota: id_empresa queda NULL si es contratación externa
+            }
+
+            $this->db->commit();
+            return Flight::json(['mensaje' => 'Estatus laboral actualizado correctamente'], 200);
+
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

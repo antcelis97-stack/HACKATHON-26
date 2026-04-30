@@ -207,6 +207,16 @@ Flight::route('POST /api/v1/empresas/vacantes', function() use ($empresa) {
     $empresa->crearVacante();
 });
 
+Flight::route('PATCH /api/v1/egresado/mi-disponibilidad', function() use ($egresado) {
+    if (!authMiddleware()) return;
+    $egresado->actualizarEstatusLaboral();
+});
+
+Flight::route('POST /api/v1/empresa/registrar-contratado', function() use ($empresa) {
+    if (!authMiddleware()) return;
+    $empresa->registrarContratacion();
+});
+
 Flight::route('GET /api/v1/match/talento/@id', function($id) use ($match) {
     if (!authMiddleware()) return;
     $match->matchTalento($id);
