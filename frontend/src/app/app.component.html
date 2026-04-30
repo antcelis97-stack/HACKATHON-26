@@ -21,14 +21,12 @@
 
   <!-- Sidebar Navigation -->
   <aside class="sidebar" [class.open]="isSidebarOpen">
-    <div class="sidebar-top-actions">
-      <button class="btn btn-theme-toggle" (click)="toggleTheme()">
-        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
-        <span>{{ isLightTheme ? 'Modo Oscuro' : 'Modo Claro' }}</span>
-      </button>
-      <button class="mobile-close-btn" (click)="toggleSidebar()">
-        <i class="bi bi-x-lg"></i>
-      </button>
+    <div class="sidebar-logo">
+      <div class="logo-icon"><i class="bi bi-mortarboard-fill"></i></div>
+      <div class="logo-text">
+        <h2>VinculaUT</h2>
+        <p>UT de la Costa</p>
+      </div>
     </div>
 
 
