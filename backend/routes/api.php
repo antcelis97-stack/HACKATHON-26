@@ -8,12 +8,14 @@ use App\Controllers\EmpresaController;
 use App\Controllers\EvaluacionController;
 use App\Controllers\MatchController;
 use App\Controllers\ReporteController;
-use App\Controllers\InegiController;
 use App\Controllers\GoogleDriveController;
+
+// Integración de los nuevos servicios
+use App\Services\SiestIntegration;
+use App\Services\BolsaNacionalAPI;
+
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-
-// ... (omitir middleware y otros por brevedad si es posible, pero mejor reemplazar bloque)
 
 // 1. Cargar variables de entorno
 if (file_exists(__DIR__ . '/../.env')) {
@@ -32,11 +34,10 @@ function authMiddleware(): bool {
 
     try {
         $token = $matches[1];
-        $secret = $_ENV['API_KEY'] ?? 'clave_secreta_para_desarrollo_32chars'; 
+        $secret = $_ENV['JWT_SECRET'] ?? 'clave_secreta_hackathon_2026'; 
         $decoded = JWT::decode($token, new Key($secret, 'HS256'));
         
-        // Guardar la info del usuario en Flight
-        Flight::set('user', $decoded);
+        Flight::set('jwt_user', $decoded);
         return true;
         
     } catch (\Exception $e) {
@@ -45,137 +46,144 @@ function authMiddleware(): bool {
     }
 }
 
-// Instanciar controladores
+// Instanciar controladores y servicios
+$auth = new AuthController();
 $login = new LoginController();
 $egresado = new EgresadoController();
 $empresa = new EmpresaController();
 $evaluacion = new EvaluacionController();
 $match = new MatchController();
 $reporte = new ReporteController();
-$inegi = new InegiController();
 $drive = new GoogleDriveController();
-$grafica = new GraficaController();
+
+$siest = new SiestIntegration();
+$bolsaNacional = new BolsaNacionalAPI();
 
 // =============================================================================
-// RUTAS PÚBLICAS
+// RUTAS PÚBLICAS (No requieren token)
 // =============================================================================
 
+// Health check
 Flight::route('GET /api/status', function(){
     Flight::json(['status' => 'API Bolsa de Trabajo UT', 'version' => '1.0.0'], 200);
 });
 
 // Autenticación
-Flight::route('POST /api/v1/iniciar-sesion', [$login, 'iniciarSesion']);
-Flight::route('POST /api/v1/refresh-token', function() use ($login) {
-    if (!authMiddleware()) return;
-    $login->refreshToken();
+Flight::route('POST /api/auth/register', [$auth, 'register']);
+Flight::route('POST /api/auth/login', [$login, 'login']);
+
+// Validación SIEst 2.0 (Para autocompletar datos en el registro)
+Flight::route('GET /api/siest/validar/@matricula', function($matricula) use ($siest) {
+    Flight::json($siest->getDatosEgresado($matricula));
 });
-Flight::route('POST /api/v1/cerrar-sesion', [$login, 'cerrarSesion']);
 
-// Búsqueda INEGI DENUE
-Flight::route('GET /api/inegi/buscar', [$inegi, 'buscar']);
+// Búsqueda de vacantes locales y nacionales
+Flight::route('GET /api/egresados/vacantes', [$egresado, 'searchVacantes']);
+
+Flight::route('GET /api/nacional/vacantes', function() use ($bolsaNacional) {
+    // Permite buscar por área (ej. ?q=Software, ?q=Acuicultura, ?q=Turismo)
+    $query = Flight::request()->query->q ?? 'profesional';
+    Flight::json($bolsaNacional->getVacantesNacionales($query));
+});
 
 // =============================================================================
-// RUTAS PROTEGIDAS
+// RUTAS PROTEGIDAS (Requieren pasar por el authMiddleware)
 // =============================================================================
-
-// Registro de empresa
-Flight::route('POST /api/v1/empresas/registrar', [$empresa, 'registrarEmpresa']);
 
 // --- MÓDULO EGRESADO ---
-Flight::route('GET /api/v1/egresados/perfil/@id', function($id) use ($egresado) {
+Flight::get('/api/egresados/:usuarioId', function($usuarioId) use ($egresado) {
     if (!authMiddleware()) return;
-    $egresado->obtenerPerfil($id);
+    $egresado->getProfile($usuarioId);
 });
 
-Flight::route('POST /api/v1/egresados/perfil/actualizar', function() use ($egresado) {
+Flight::route('POST /api/egresados/update-profile', function() use ($egresado) {
     if (!authMiddleware()) return;
-    $egresado->actualizarPerfil();
+    $egresado->updateProfile();
 });
 
-// --- MÓDULO GOOGLE DRIVE ---
-Flight::route('POST /api/v1/drive/subir/cv', function() use ($drive) {
+Flight::route('PUT /api/egresados/perfil', function() use ($egresado) {
     if (!authMiddleware()) return;
-    $drive->subirCV();
+    $egresado->updateProfile();
 });
 
-Flight::route('POST /api/v1/drive/subir/foto', function() use ($drive) {
+Flight::route('POST /api/egresados/cv', function() use ($drive) {
     if (!authMiddleware()) return;
-    $drive->subirFoto();
+    $drive->uploadCV();
 });
 
-Flight::route('POST /api/v1/drive/subir/logo', function() use ($drive) {
-    if (!authMiddleware()) return;
-    $drive->subirLogo();
-});
-
-Flight::route('POST /api/v1/drive/subir/convenio', function() use ($drive) {
-    if (!authMiddleware()) return;
-    $drive->subirConvenio();
-});
-
-Flight::route('DELETE /api/v1/drive/eliminar/@id', function($id) use ($drive) {
-    if (!authMiddleware()) return;
-    $drive->eliminarArchivo($id);
-});
-
-// --- MÓDULO REPORTES (DASHBOARDS ESTRATÉGICOS) ---
-Flight::route('GET /api/v1/reportes/egresados/aptitudes', function() use ($reporte) {
-    if (!authMiddleware()) return;
-    $reporte->obtenerAptitudesPredominantes();
-});
-
-Flight::route('GET /api/v1/reportes/empresas/estadisticas', function() use ($reporte) {
-    if (!authMiddleware()) return;
-    $reporte->obtenerEstadisticasEmpresariales();
-});
-
-Flight::route('GET /api/v1/reportes/institucional/monitoreo', function() use ($reporte) {
-    if (!authMiddleware()) return;
-    $reporte->obtenerMonitoreoInstitucional();
-});
-
-Flight::route('GET /api/v1/reportes/radar/@usuarioId', function($usuarioId) use ($reporte) {
-    if (!authMiddleware()) return;
-    $reporte->getRadarCompetencias($usuarioId);
-});
-
-// --- MÓDULO GRÁFICAS ---
-Flight::route('GET /api/v1/graficas/radar/@usuarioId', function($usuarioId) use ($grafica) {
-    if (!authMiddleware()) return;
-    $grafica->generateSkillGraph($usuarioId);
-});
-
-// --- OTROS MÓDULOS ---
-Flight::route('POST /api/v1/evaluaciones', function() use ($evaluacion) {
+Flight::route('POST /api/evaluaciones', function() use ($evaluacion) {
     if (!authMiddleware()) return;
     $evaluacion->saveResultados();
 });
 
-Flight::route('POST /api/v1/contratacion/externa', function() use ($empresa) {
+// --- MÓDULO EMPRESA ---
+Flight::route('POST /api/empresas/vacantes', function() use ($empresa) {
     if (!authMiddleware()) return;
-    $empresa->registrarContratacionExterna();
+    $empresa->createVacante();
 });
 
-Flight::route('POST /api/v1/empresas/vacantes', function() use ($empresa) {
+Flight::route('GET /api/match/vacante/@id', function($id) use ($match) {
     if (!authMiddleware()) return;
-    $empresa->crearVacante();
+    $match->getCandidatosIdoneos($id);
 });
 
-Flight::route('GET /api/v1/match/talento/@id', function($id) use ($match) {
+// --- MÓDULO REPORTES (DASHBOARDS E HISTOGRAMAS) ---
+// 1. Institucionales
+Flight::route('GET /api/reportes/insercion', function() use ($reporte) {
     if (!authMiddleware()) return;
-    $match->matchTalento($id);
+    $reporte->getInsercionLaboral();
+});
+
+Flight::route('GET /api/reportes/mapa-calor', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getMapaCalor();
+});
+
+Flight::route('GET /api/reportes/competencias/ranking', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getRankingCompetencias();
+});
+
+Flight::route('GET /api/reportes/convenios/estatus', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getEstatusConvenios();
+});
+
+// 2. Talento / Egresado
+Flight::route('GET /api/reportes/histograma/@egresadoId', function($egresadoId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getHistograma($egresadoId);
+});
+
+Flight::route('GET /api/reportes/radar/@egresadoId/@vacanteId', function($egresadoId, $vacanteId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getRadarComparativo($egresadoId, $vacanteId);
+});
+
+// 3. Empresarial
+Flight::route('GET /api/reportes/empresas/@empresaId/analitica', function($empresaId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getAnaliticaVacantes($empresaId);
+});
+
+Flight::route('GET /api/reportes/empresas/@empresaId/plantilla-ut', function($empresaId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getPlantillaUT($empresaId);
 });
 
 // =============================================================================
-// MANEJO DE ERRORES
+// MANEJO DE ERRORES GLOBAL
 // =============================================================================
 Flight::map('error', function(\Throwable $e) {
     $code = $e->getCode() ?: 500;
     if ($code < 100 || $code > 599) $code = 500;
-    Flight::json(['error' => 'Error del servidor', 'detalle' => $e->getMessage()], $code);
+    
+    Flight::json([
+        'error' => 'Error interno del servidor',
+        'detalle' => $e->getMessage()
+    ], $code);
 });
 
 Flight::map('notFound', function() {
-    Flight::json(['error' => 'Endpoint no encontrado'], 404);
+    Flight::json(['error' => 'Endpoint de Bolsa de Trabajo no encontrado'], 404);
 });
