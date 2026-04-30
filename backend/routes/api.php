@@ -71,6 +71,9 @@ Flight::route('POST /api/v1/cerrar-sesion', [$login, 'cerrarSesion']);
 // RUTAS PROTEGIDAS
 // =============================================================================
 
+// Registro de empresa
+Flight::route('POST /api/v1/empresas/registrar', [$empresa, 'registrarEmpresa']);
+
 // --- MÓDULO EGRESADO ---
 Flight::route('GET /api/v1/egresados/perfil/@id', function($id) use ($egresado) {
     if (!authMiddleware()) return;
