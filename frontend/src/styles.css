@@ -6,8 +6,8 @@
   --primary-600: #002244;
   --primary-700: #102a43;
   
-  --secondary: #10b981;
-  --accent: #f59e0b;
+  --secondary: #008080; /* Verde Teal Oficial UT */
+  --accent: #008080;
   --danger: #ef4444;
   
   /* Institutional Light Theme (Default) */
@@ -24,8 +24,8 @@
   
   --badge-primary-bg: #dbeafe;
   --badge-primary-text: #1e40af;
-  --badge-success-bg: #dcfce7;
-  --badge-success-text: #166534;
+  --badge-success-bg: #f0fdfa;
+  --badge-success-text: #008080;
   
   --font-heading: 'Poppins', sans-serif;
   --font-body: 'Poppins', sans-serif;

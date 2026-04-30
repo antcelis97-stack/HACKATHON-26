@@ -260,7 +260,7 @@
                       <span class="eval-score">88/100</span>
                     </div>
                     <div class="progress-bar">
-                      <div class="progress-fill" style="width: 88%; background: #8b5cf6;"></div>
+                      <div class="progress-fill" style="width: 88%; background: var(--primary-500);"></div>
                     </div>
                     <p class="eval-desc">Estabilidad emocional robusta. Perfil de liderazgo identificado.</p>
                   </div>
@@ -410,7 +410,7 @@
                   <div style="flex: 1; padding-right: 1rem;">
                     <h5 style="margin: 0; color: var(--text-light); font-size: 1.1rem;"><i class="bi bi-map-fill"></i> {{selectedEmpresa?.Nombre}}</h5>
                   </div>
-                  <button *ngIf="selectedEmpresa?.Nombre !== 'Tepic, Nayarit (Vista General)'" (click)="trazarRutaEnMapa()" class="btn btn-primary small" style="background-color: #10b981; border-color: #10b981; flex-shrink: 0;">
+                  <button *ngIf="selectedEmpresa?.Nombre !== 'Tepic, Nayarit (Vista General)'" (click)="trazarRutaEnMapa()" class="btn btn-accent small" style="flex-shrink: 0;">
                     <i class="bi bi-sign-turn-right-fill"></i> Ver Ruta en Mapa
                   </button>
                 </div>
