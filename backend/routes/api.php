@@ -9,16 +9,21 @@ use App\Controllers\EvaluacionController;
 use App\Controllers\MatchController;
 use App\Controllers\ReporteController;
 use App\Controllers\GoogleDriveController;
+
+// Integración de los nuevos servicios
+use App\Services\SiestIntegration;
+use App\Services\BolsaNacionalAPI;
+
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-// 1. Cargar variables de entorno (Excelente práctica de tu proyecto pasado)
+// 1. Cargar variables de entorno
 if (file_exists(__DIR__ . '/../.env')) {
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
     $dotenv->load();
 }
 
-// 2. Rescatamos tu Middleware de Autenticación JWT
+// 2. Middleware de Autenticación JWT
 function authMiddleware(): bool {
     $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
@@ -29,11 +34,9 @@ function authMiddleware(): bool {
 
     try {
         $token = $matches[1];
-        // En producción, esto debe venir de $_ENV['API_KEY']
         $secret = $_ENV['JWT_SECRET'] ?? 'clave_secreta_hackathon_2026'; 
         $decoded = JWT::decode($token, new Key($secret, 'HS256'));
         
-        // Guardar la info del usuario en la memoria de Flight para usarla en los controladores
         Flight::set('jwt_user', $decoded);
         return true;
         
@@ -43,7 +46,7 @@ function authMiddleware(): bool {
     }
 }
 
-// Instanciar controladores
+// Instanciar controladores y servicios
 $auth = new AuthController();
 $login = new LoginController();
 $egresado = new EgresadoController();
@@ -53,11 +56,14 @@ $match = new MatchController();
 $reporte = new ReporteController();
 $drive = new GoogleDriveController();
 
+$siest = new SiestIntegration();
+$bolsaNacional = new BolsaNacionalAPI();
+
 // =============================================================================
 // RUTAS PÚBLICAS (No requieren token)
 // =============================================================================
 
-// Health check para el equipo de Frontend
+// Health check
 Flight::route('GET /api/status', function(){
     Flight::json(['status' => 'API Bolsa de Trabajo UT', 'version' => '1.0.0'], 200);
 });
@@ -66,8 +72,19 @@ Flight::route('GET /api/status', function(){
 Flight::route('POST /api/auth/register', [$auth, 'register']);
 Flight::route('POST /api/auth/login', [$login, 'login']);
 
-// Búsqueda de vacantes (Las empresas quieren que las vacantes sean públicas para atraer talento)
+// Validación SIEst 2.0 (Para autocompletar datos en el registro)
+Flight::route('GET /api/siest/validar/@matricula', function($matricula) use ($siest) {
+    Flight::json($siest->getDatosEgresado($matricula));
+});
+
+// Búsqueda de vacantes locales y nacionales
 Flight::route('GET /api/egresados/vacantes', [$egresado, 'searchVacantes']);
+
+Flight::route('GET /api/nacional/vacantes', function() use ($bolsaNacional) {
+    // Permite buscar por área (ej. ?q=Software, ?q=Acuicultura, ?q=Turismo)
+    $query = Flight::request()->query->q ?? 'profesional';
+    Flight::json($bolsaNacional->getVacantesNacionales($query));
+});
 
 // =============================================================================
 // RUTAS PROTEGIDAS (Requieren pasar por el authMiddleware)
@@ -110,7 +127,8 @@ Flight::route('GET /api/match/vacante/@id', function($id) use ($match) {
     $match->getCandidatosIdoneos($id);
 });
 
-// --- MÓDULO REPORTES (DASHBOARDS INSTITUCIONALES) ---
+// --- MÓDULO REPORTES (DASHBOARDS E HISTOGRAMAS) ---
+// 1. Institucionales
 Flight::route('GET /api/reportes/insercion', function() use ($reporte) {
     if (!authMiddleware()) return;
     $reporte->getInsercionLaboral();
@@ -121,13 +139,40 @@ Flight::route('GET /api/reportes/mapa-calor', function() use ($reporte) {
     $reporte->getMapaCalor();
 });
 
-Flight::route('GET /api/reportes/radar/@egresadoId', function($egresadoId) use ($reporte) {
+Flight::route('GET /api/reportes/competencias/ranking', function() use ($reporte) {
     if (!authMiddleware()) return;
-    $reporte->getRadarCompetencias($egresadoId);
+    $reporte->getRankingCompetencias();
+});
+
+Flight::route('GET /api/reportes/convenios/estatus', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getEstatusConvenios();
+});
+
+// 2. Talento / Egresado
+Flight::route('GET /api/reportes/histograma/@egresadoId', function($egresadoId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getHistograma($egresadoId);
+});
+
+Flight::route('GET /api/reportes/radar/@egresadoId/@vacanteId', function($egresadoId, $vacanteId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getRadarComparativo($egresadoId, $vacanteId);
+});
+
+// 3. Empresarial
+Flight::route('GET /api/reportes/empresas/@empresaId/analitica', function($empresaId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getAnaliticaVacantes($empresaId);
+});
+
+Flight::route('GET /api/reportes/empresas/@empresaId/plantilla-ut', function($empresaId) use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->getPlantillaUT($empresaId);
 });
 
 // =============================================================================
-// MANEJO DE ERRORES GLOBAL (Rescatado de tu archivo)
+// MANEJO DE ERRORES GLOBAL
 // =============================================================================
 Flight::map('error', function(\Throwable $e) {
     $code = $e->getCode() ?: 500;
