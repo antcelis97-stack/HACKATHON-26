@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "modulo-de-egresaods",
+  "private_key_id": "d9bbba593132539981243f61106a9e2739c9b9e6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDiKih0AFjurmwV\nXszCURmGVg3b9ja/Xv79huO7zZ0XIRehzJ8/UaA8DkR3jkVwRrh3ZEDFE0YPrnSI\n5vITsEvmckDQnE4ejT+gurjXncDubtGxlm28+M7ujxGITqXokiho1QQ8PChPn1Q6\nVENhw5rCZWZsIGWkpzbYHFIdo4vTvF1m0URZA0sdvUfSpH2ymG+kf5n0bubgFrW2\nLyqLp2Ibps8REBJrUJI7z8/s+///SwxEX2au7pcRLF+1KV2toIEDzx3NTQVhoowC\nVTb/tx1zFghcl+U+FKpilkaYCkv3Pu7O+3OS/LsSkwA8uBL4ET3PSYioc0KvPkbF\nlhTx+iYxAgMBAAECggEABAN3ypdvGQl44GSLNPhd+NgFm1Sc/PFCRVk+YcGvAD1w\nLyyFd7q49u4YcZEKa+yTJIaYkf3efJ56QAEmwTvb46DL0mKUKm8+i9mFVPQ6tIXY\n4aQNPY2GBlyZjc0sK2VVuL+mVddtkdG3cQU4Eli3jMiNDTvl1lHHPJPZMm6fCwpi\nJNsf9qNFQfaY9ayxungMxrZQRldLDWCx9IbP4PdXVJJ59N1QhJ6XsIcsGD0Ubr5R\nlsfP2uTzoOcjH0L1z8lXOnqOL3ZpejmMeJcOual8F/+2Wl3XGjfT+2N1Y5EEueLL\n1AIoziegrjMaoTA9lDd7tVjG8OqFdDA+ULWP0aSV7QKBgQD3lH+uW2lRXbwY4PvY\n5k4WMx9i6RLn1sSsIHqMEH0a9wvFh2YMHncu0MgEpVjm5Ud1/8kMGOny9LQtjHrP\nR9DNvtGkUdl2RK+vTIS0qfPKL7red12OGzO5NFohoKDhoPzN17OYH7BI8+beXIPD\nRtigXxXDHCNhA+Jb4TWIAlTyXQKBgQDp2zX7nSCXxyQuKA+B/XF4RMCPoZKugQCk\n08MR1WT+32KgXrZuk27Qr1Cc6QKlNpX8+ovnvQPSpH23v48LmePZiTATvgbqNFrH\n15PYz22epNewkGXyxn6avN1BquldwzRLO/78LzsFAuTDklMLSeZsshyPPbb6owfe\nk3mn4r8t5QKBgQCTUczMHl7D6OflUfLqdNhgQ1lYzOHQDK8I0Wa6c5FN+1UI2/Gw\nImy+8cMjaJRHCIWGRIcIaMbFKDESrXXiY5Ru6S3r/jxNML/tqrWIn1yOoeorOJH1\n3l/fw7QiMGeq+tWTUtfuHGUUc/WbuSc6iqyaeRoE+Hhg4SPPkmn9HY4YjQKBgQCk\no2LW+KEomde78xIv5vlKvcR/mjXFSybj4/4SgRSwZx5tXyC6qms62iI7xcPKAqsH\nxnBWvviBBLNJeMBBX59M2EuTqpX9rsw2o2wAGNDI/q6nLJHJoLsjP1HZ2HShQTuA\nuAVlD+9SMN5TXaG/cdCat65pnf5DaCGzLkpYysbjjQKBgQDV4e5KTsNuaIuV1S2j\n0MbNBjlvtmJwOIzPhjnGJXvFQttfjo55FCydcyByqfCrGPj/vRalwxd9hHQJdVc7\nmZXwqLvaSt+mtlkgealiS4GKVIDIc1DV2ojBMg19r3tm/u2QmIa4LB9kDFcfJCmM\nsDvM8uxjyzFwRdNHch63rP6tPQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "bolsa-de-trabajo@modulo-de-egresaods.iam.gserviceaccount.com",
+  "client_id": "117361395768073830977",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bolsa-de-trabajo%40modulo-de-egresaods.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
