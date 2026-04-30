@@ -1,60 +1,46 @@
 :root {
-  /* Brand Colors - Ocean/Tech inspired for UT de la Costa */
+  /* Official UT de la Costa Palette */
   --primary-50: #eff6ff;
   --primary-100: #dbeafe;
-  --primary-500: #3b82f6;
+  --primary-500: #3b82f6; /* Azul Institucional */
   --primary-600: #2563eb;
-  --primary-900: #1e3a8a;
+  --primary-700: #1d4ed8;
   
-  --secondary: #10b981; /* Emerald for success/growth */
-  --accent: #f59e0b; /* Amber for highlights */
-  --danger: #ef4444; /* Red for alerts */
+  --secondary: #10b981;
+  --accent: #f59e0b;
+  --danger: #ef4444;
   
-  /* Default Dark Mode Palette */
-  --bg-main: #020617;
-  --bg-sidebar: #0f172a;
-  --surface: rgba(30, 41, 59, 0.7);
-  --surface-border: rgba(255, 255, 255, 0.1);
-  --surface-hover: rgba(51, 65, 85, 0.8);
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --glass-blur: blur(16px);
-  
-  --nav-active-bg: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(37, 99, 235, 0.05));
-  --nav-active-text: var(--primary-100);
-  
-  --badge-primary-bg: rgba(37, 99, 235, 0.1);
-  --badge-primary-text: var(--primary-100);
-  --badge-success-bg: rgba(16, 185, 129, 0.1);
-  --badge-success-text: var(--secondary);
-  
-  --font-heading: 'Outfit', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Light Theme (White & Black) */
-.light-theme {
-  --bg-main: #f8fafc;
+  /* Institutional Light Theme (Default) */
+  --bg-main: #f9fafb;
   --bg-sidebar: #ffffff;
   --surface: #ffffff;
-  --surface-border: #e2e8f0;
-  --surface-hover: #f1f5f9;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --glass-blur: none;
+  --surface-border: #e5e7eb;
+  --surface-hover: #f3f4f6;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
   
-  --nav-active-bg: rgba(37, 99, 235, 0.1);
-  --nav-active-text: #2563eb;
+  --nav-active-bg: #eff6ff;
+  --nav-active-text: #1d4ed8;
   
-  --badge-primary-bg: rgba(37, 99, 235, 0.1);
-  --badge-primary-text: #2563eb;
-  --badge-success-bg: rgba(16, 185, 129, 0.1);
-  --badge-success-text: #10b981;
+  --badge-primary-bg: #dbeafe;
+  --badge-primary-text: #1e40af;
+  --badge-success-bg: #dcfce7;
+  --badge-success-text: #166534;
   
-  --primary-500: #3b82f6;
-  --primary-600: #2563eb;
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Poppins', sans-serif;
+  --transition: all 0.2s ease-in-out;
+}
+
+/* Dark Mode (Optional adjustment for official look) */
+.dark-theme {
+  --bg-main: #111827;
+  --bg-sidebar: #1f2937;
+  --surface: #1f2937;
+  --surface-border: #374151;
+  --surface-hover: #374151;
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
 }
 
 * {
@@ -66,10 +52,6 @@
 body {
   font-family: var(--font-body);
   background-color: var(--bg-main);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
-  background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -85,20 +67,17 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-/* Glassmorphism utility */
+/* Modern Institutional Cards */
 .glass-panel {
   background: var(--surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--surface-border);
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   transition: var(--transition);
 }
 
 .glass-panel:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .btn {
@@ -106,36 +85,32 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
   font-family: var(--font-body);
   cursor: pointer;
   transition: var(--transition);
   border: none;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  background: var(--primary-500);
   color: white;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+  background: var(--primary-600);
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, var(--accent), #d97706);
+  background: var(--accent);
   color: white;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
 }
 
 .btn-accent:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+  filter: brightness(0.9);
 }
 
 .btn:disabled {

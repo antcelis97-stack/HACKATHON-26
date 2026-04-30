@@ -21,11 +21,15 @@
 
   <!-- Sidebar Navigation -->
   <aside class="sidebar" [class.open]="isSidebarOpen">
-    <div class="sidebar-logo">
-      <div class="logo-icon"><i class="bi bi-mortarboard-fill"></i></div>
-      <div class="logo-text">
-        <h2>VinculaUT</h2>
-        <p>UT de la Costa</p>
+    <div class="sidebar-header" style="padding: 1.5rem 1rem; border-bottom: 1px solid var(--surface-border); margin-bottom: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="logo-icon" style="background: var(--primary-600); width: 42px; height: 42px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+          <i class="bi bi-mortarboard-fill" style="font-size: 1.5rem;"></i>
+        </div>
+        <div>
+          <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--primary-700);">VinculaUT</h2>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">UT de la Costa</span>
+        </div>
       </div>
     </div>
 
@@ -51,14 +55,14 @@
 
     <!-- Seccion de botones movida arriba -->
 
-    <div class="sidebar-footer">
-      <div class="user-profile" style="flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding-top: 1rem;">
-        <!-- Logo Perfil: UTClogin.jpg -->
-        <img src="assets/UTClogin.jpg?v=3" alt="Logo Perfil" style="width: 70px; height: 70px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-        
-        <div class="user-info" style="margin-left: 0;">
-          <h5 style="margin-bottom: 0.2rem; font-size: 1.1rem;">UT de la Costa</h5>
-          <span style="font-size: 0.85rem;">Gestión Nacional</span>
+    <div class="sidebar-footer" style="padding: 1.25rem 1rem; border-top: 1px solid var(--surface-border); background: #f8fafc;">
+      <div class="user-profile" style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="avatar" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-600); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem;">
+          UTC
+        </div>
+        <div class="user-info">
+          <h5 style="margin: 0; font-size: 0.85rem; font-weight: 600; color: #1f2937;">Admin Institucional</h5>
+          <span style="font-size: 0.7rem; color: #6b7280;">Portal Vinculación</span>
         </div>
       </div>
     </div>

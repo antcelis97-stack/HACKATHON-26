@@ -11,7 +11,7 @@
   border-right: 1px solid var(--surface-border);
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.5rem 1rem;
   z-index: 1000;
   transition: var(--transition);
 }
@@ -53,27 +53,34 @@
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.875rem 1rem;
-  border-radius: 12px;
-  color: var(--text-muted);
+  gap: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  color: #4b5563;
   text-decoration: none;
   font-weight: 500;
+  font-size: 0.9rem;
   transition: var(--transition);
 }
 
 .nav-item i {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  color: #6b7280;
 }
 
 .nav-item:hover {
   background: var(--surface-hover);
-  color: var(--text-main);
+  color: var(--primary-600);
 }
 
 .nav-item.active {
   background: var(--nav-active-bg);
   color: var(--nav-active-text);
+  font-weight: 600;
+}
+
+.nav-item.active i {
+  color: var(--primary-600);
 }
 
 .nav-item.active i {
@@ -143,11 +150,11 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: var(--surface);
-  padding: 0.75rem 1.5rem;
-  border-radius: 20px;
-  border: 1px solid var(--surface-border);
-  width: 400px;
+  background: #f3f4f6;
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  width: 380px;
 }
 
 .search-bar i {
@@ -203,30 +210,30 @@
 }
 
 .kpi-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
+  font-size: 1.4rem;
+  background: #eff6ff;
+  color: #3B82F6;
 }
 
 .kpi-icon.success {
-  background: rgba(6, 182, 212, 0.1);
-  color: #22d3ee;
+  background: #ecfdf5;
+  color: #10b981;
 }
 
 .kpi-icon.warning {
-  background: rgba(244, 63, 94, 0.1);
-  color: #fb7185;
+  background: #fffbeb;
+  color: #f59e0b;
 }
 
 .kpi-icon.info {
-  background: rgba(167, 139, 250, 0.1);
-  color: #a78bfa;
+  background: #f5f3ff;
+  color: #8b5cf6;
 }
 
 .kpi-info {
