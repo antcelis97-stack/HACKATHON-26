@@ -88,4 +88,47 @@ class AdministradorController extends BaseController {
             return Flight::json(['error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * GET /api/v1/admin/convenios/aceptados
+     */
+    public function listarConveniosAceptados() {
+        try {
+            $stmt = $this->db->query("
+                SELECT c.id_convenio, e.razon_social, c.fecha_inicio, c.fecha_vencimiento, c.url_archivo_drive 
+                FROM convenios c JOIN empresas e ON c.id_empresa = e.id_empresa 
+                WHERE c.estatus = 'activo' ORDER BY c.fecha_vencimiento ASC
+            ");
+            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) { return Flight::json(['error' => $e->getMessage()], 500); }
+    }
+
+    /**
+     * GET /api/v1/admin/convenios/rechazados
+     */
+    public function listarConveniosRechazados() {
+        try {
+            $stmt = $this->db->query("
+                SELECT c.id_convenio, e.razon_social, c.comentarios, c.fecha_registro, c.url_archivo_drive 
+                FROM convenios c JOIN empresas e ON c.id_empresa = e.id_empresa 
+                WHERE c.estatus = 'rechazado' ORDER BY c.fecha_registro DESC
+            ");
+            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) { return Flight::json(['error' => $e->getMessage()], 500); }
+    }
+
+    /**
+     * GET /api/v1/admin/convenios/vencidos
+     */
+    public function listarConveniosVencidos() {
+        try {
+            $stmt = $this->db->query("
+                SELECT c.id_convenio, e.razon_social, c.fecha_vencimiento, c.url_archivo_drive 
+                FROM convenios c JOIN empresas e ON c.id_empresa = e.id_empresa 
+                WHERE c.estatus = 'vencido' OR (c.estatus = 'activo' AND c.fecha_vencimiento < CURRENT_DATE)
+                ORDER BY c.fecha_vencimiento DESC
+            ");
+            return Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) { return Flight::json(['error' => $e->getMessage()], 500); }
+    }
 }

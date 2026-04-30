@@ -100,6 +100,24 @@ Flight::route('POST /api/v1/admin/convenios/rechazar/@id', function($id) use ($a
     $admin->rechazarConvenio($id);
 });
 
+Flight::route('GET /api/v1/admin/convenios/aceptados', function() use ($admin) {
+    if (!authMiddleware()) return;
+    if (Flight::get('user')->rol !== 'admin') return Flight::json(['error' => 'Acceso denegado'], 403);
+    $admin->listarConveniosAceptados();
+});
+
+Flight::route('GET /api/v1/admin/convenios/rechazados', function() use ($admin) {
+    if (!authMiddleware()) return;
+    if (Flight::get('user')->rol !== 'admin') return Flight::json(['error' => 'Acceso denegado'], 403);
+    $admin->listarConveniosRechazados();
+});
+
+Flight::route('GET /api/v1/admin/convenios/vencidos', function() use ($admin) {
+    if (!authMiddleware()) return;
+    if (Flight::get('user')->rol !== 'admin') return Flight::json(['error' => 'Acceso denegado'], 403);
+    $admin->listarConveniosVencidos();
+});
+
 
 // Registro de empresa
 Flight::route('POST /api/v1/empresas/registrar', [$empresa, 'registrarEmpresa']);
