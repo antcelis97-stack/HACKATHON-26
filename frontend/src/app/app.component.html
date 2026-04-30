@@ -201,7 +201,7 @@
           <div class="profile-actions profile-actions-wrap">
             <input type="file" #cvInput style="display: none;" (change)="onCvSelected($event)" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
             <button type="button" class="btn btn-primary" (click)="descargarPDF()"><i class="bi bi-file-earmark-pdf"></i> Exportar Reporte</button>
-            <button type="button" class="btn btn-outline" (click)="cvInput.click()" title="PDF, Word">
+            <button type="button" class="btn btn-green" (click)="cvInput.click()" title="PDF, Word">
               <i class="bi bi-cloud-upload"></i> Subir CV / Actualizar CV
             </button>
             <button

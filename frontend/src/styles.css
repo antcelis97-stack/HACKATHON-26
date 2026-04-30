@@ -195,6 +195,17 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 6px 20px rgba(0, 61, 51, 0.45);
 }
 
+.btn-green {
+  background: linear-gradient(180deg, var(--utc-green-600) 0%, var(--utc-green-500) 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(15, 122, 80, 0.35);
+}
+
+.btn-green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(15, 122, 80, 0.42);
+}
+
 .btn-outline {
   background: transparent;
   color: var(--text-main);
