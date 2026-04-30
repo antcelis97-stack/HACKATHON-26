@@ -185,6 +185,11 @@ Flight::route('GET /api/v1/reportes/convenios/estatus', function() use ($reporte
     $reporte->obtenerEstatusConvenios();
 });
 
+Flight::route('GET /api/v1/reportes/contrataciones/tiempo', function() use ($reporte) {
+    if (!authMiddleware()) return;
+    $reporte->obtenerEstadisticasContratacion();
+});
+
 Flight::route('GET /api/v1/reportes/radar/@usuarioId', function($usuarioId) use ($reporte) {
     if (!authMiddleware()) return;
     $reporte->getRadarCompetencias($usuarioId);

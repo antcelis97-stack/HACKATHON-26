@@ -130,4 +130,36 @@ class ReporteController extends BaseController {
             return Flight::json(['error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Reporte de Indicadores de Éxito Laboral: Métricas temporales y por carrera
+     */
+    public function obtenerEstadisticasContratacion() {
+        try {
+            $stmt = $this->db->query("
+                SELECT 
+                    -- Métricas Temporales
+                    (SELECT COUNT(*) FROM contrataciones) as total_general,
+                    (SELECT COUNT(*) FROM contrataciones WHERE fecha_contratacion >= CURRENT_DATE - INTERVAL '30 days') as este_mes,
+                    (SELECT COUNT(*) FROM contrataciones WHERE fecha_contratacion >= DATE_TRUNC('year', CURRENT_DATE)) as este_anio,
+                    
+                    -- Desglose por Carrera
+                    (
+                        SELECT json_agg(carreras_stats)
+                        FROM (
+                            SELECT 
+                                cr.nombre_carrera,
+                                COUNT(cn.id_contratacion) as contrataciones_totales
+                            FROM carreras cr
+                            LEFT JOIN egresados eg ON cr.id_carrera = eg.id_carrera
+                            LEFT JOIN contrataciones cn ON eg.cve_alumno = cn.cve_alumno
+                            GROUP BY cr.nombre_carrera
+                        ) carreras_stats
+                    ) as desglose_por_carrera
+            ");
+            return Flight::json($stmt->fetch(PDO::FETCH_ASSOC), 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
