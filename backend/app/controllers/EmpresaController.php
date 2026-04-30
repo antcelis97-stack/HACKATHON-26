@@ -258,53 +258,57 @@ class EmpresaController extends BaseController {
         $data = $this->getInput();
         $id_denue = $data['id_denue'] ?? null;
         $cve_alumno = $data['cve_alumno'] ?? null;
+        $nombre_manual = $data['razon_social'] ?? null; // Para Adzuna
 
-        if (!$id_denue || !$cve_alumno) {
-            return Flight::json(['error' => 'id_denue y cve_alumno son requeridos'], 400);
+        if (!$cve_alumno || (!$id_denue && !$nombre_manual)) {
+            return Flight::json(['error' => 'cve_alumno y (id_denue o razon_social) son requeridos'], 400);
         }
 
         try {
             $this->db->beginTransaction();
 
-            // 1. Verificar si la empresa ya existe
-            $stmt = $this->db->prepare("SELECT id_empresa FROM empresas WHERE id_denue = ?");
-            $stmt->execute([$id_denue]);
-            $empresa = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $id_empresa = null;
 
-            if (!$empresa) {
-                // 2. Si es nueva y Nacional, consultar INEGI
-                $token = $_ENV['INEGI_DENUE_TOKEN'] ?? '';
-                $url = "https://www3.inegi.org.mx/sistemas/api/denue/v1/stats/id/{$id_denue}/{$token}";
-                $res = @file_get_contents($url);
-                $datosInegi = json_decode($res, true);
+            // 1. Caso INEGI (DENUE)
+            if ($id_denue) {
+                $stmt = $this->db->prepare("SELECT id_empresa FROM empresas WHERE id_denue = ?");
+                $stmt->execute([$id_denue]);
+                $empresa = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-                if (empty($datosInegi) || !isset($datosInegi[0])) {
-                    throw new \Exception("No se pudo obtener información del INEGI");
+                if (!$empresa) {
+                    $token = $_ENV['INEGI_DENUE_TOKEN'] ?? '';
+                    $url = "https://www3.inegi.org.mx/sistemas/api/denue/v1/stats/id/{$id_denue}/{$token}";
+                    $res = @file_get_contents($url);
+                    $datosInegi = json_decode($res, true);
+
+                    if (!empty($datosInegi) && isset($datosInegi[0])) {
+                        $info = $datosInegi[0];
+                        $stmtIns = $this->db->prepare("INSERT INTO empresas (razon_social, id_denue, sector, ubicacion) VALUES (?, ?, ?, ?) RETURNING id_empresa");
+                        $stmtIns->execute([$info['Nombre'], $id_denue, $info['Clase'], $info['Ubicacion']]);
+                        $id_empresa = $stmtIns->fetchColumn();
+                    }
+                } else {
+                    $id_empresa = $empresa['id_empresa'];
                 }
-
-                $info = $datosInegi[0];
-                
-                // 3. Registrar empresa (Sin URL de convenio aún, ya que es automática)
-                $stmtIns = $this->db->prepare("
-                    INSERT INTO empresas (razon_social, id_denue, sector, ubicacion) 
-                    VALUES (?, ?, ?, ?) RETURNING id_empresa
-                ");
-                $stmtIns->execute([
-                    $info['Nombre'] ?? 'Empresa Nacional',
-                    $id_denue,
-                    $info['Clase'] ?? 'Sector Nacional',
-                    $info['Ubicacion'] ?? 'Nacional'
-                ]);
+            } 
+            
+            // 2. Caso Bolsa Nacional (Sin DENUE)
+            if (!$id_empresa && $nombre_manual) {
+                $stmtIns = $this->db->prepare("INSERT INTO empresas (razon_social, sector, ubicacion) VALUES (?, 'Nacional (Adzuna)', ?) RETURNING id_empresa");
+                $stmtIns->execute([$nombre_manual, $data['ubicacion'] ?? 'México']);
                 $id_empresa = $stmtIns->fetchColumn();
+            }
 
-                // 4. CREAR CONVENIO PENDIENTE (Regla: El administrador debe formalizarlo)
-                $stmtConv = $this->db->prepare("
-                    INSERT INTO convenios (id_empresa, estatus, comentarios) 
-                    VALUES (?, 'pendiente', 'Registro Nacional vía DENUE: Pendiente de formalización por Administrador UT')
-                ");
+            // 3. Crear convenio pendiente y registrar contratación
+            if ($id_empresa) {
+                $stmtConv = $this->db->prepare("INSERT INTO convenios (id_empresa, estatus, comentarios) VALUES (?, 'pendiente', 'Registro Nacional: Pendiente de formalización por Administrador') ON CONFLICT DO NOTHING");
                 $stmtConv->execute([$id_empresa]);
-            } else {
-                $id_empresa = $empresa['id_empresa'];
+
+                $stmtC = $this->db->prepare("INSERT INTO contrataciones (cve_alumno, id_vacante, fecha_contratacion) VALUES (?, NULL, CURRENT_DATE)");
+                $stmtC->execute([$cve_alumno]);
+
+                $stmtE = $this->db->prepare("UPDATE egresados SET estatus_laboral = 'contratado' WHERE cve_alumno = ?");
+                $stmtE->execute([$cve_alumno]);
             }
 
             // 5. Registrar la contratación

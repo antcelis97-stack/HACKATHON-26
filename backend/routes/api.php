@@ -140,6 +140,11 @@ Flight::route('POST /api/v1/postulaciones/aplicar', function() use ($egresado) {
     $egresado->postularseAVacante();
 });
 
+Flight::route('GET /api/v1/vacantes/nacionales', function() use ($egresado) {
+    if (!authMiddleware()) return;
+    $egresado->explorarNacionales();
+});
+
 // --- MÓDULO EMPRESA ---
 Flight::route('POST /api/empresas/vacantes', function() use ($empresa) {
     if (!authMiddleware()) return;
