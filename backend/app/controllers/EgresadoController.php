@@ -100,27 +100,17 @@ class EgresadoController extends BaseController {
     }
 
     public function searchVacantes() {
-        // Obtenemos los query params (?ubicacion=X&especialidad=Y) usando Flight
-        $request = Flight::request();
-        $ubicacion = $request->query->ubicacion;
-        $especialidad = $request->query->especialidad;
+        // Obtenemos solo vacantes activas según el esquema actual
+        $query = "SELECT * FROM vacantes WHERE estado = TRUE";
+        
+        try {
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            $vacantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $query = "SELECT * FROM vacantes WHERE estatus = 'activa'";
-        $params = [];
-
-        if ($ubicacion) {
-            $query .= " AND ubicacion = ?";
-            $params[] = $ubicacion;
+            return Flight::json($vacantes, 200);
+        } catch (\Exception $e) {
+            return Flight::json(['error' => 'Error al buscar vacantes', 'detalle' => $e->getMessage()], 500);
         }
-        if ($especialidad) {
-            $query .= " AND especialidad = ?";
-            $params[] = $especialidad;
-        }
-
-        $stmt = $this->db->prepare($query);
-        $stmt->execute($params);
-        $vacantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return Flight::json($vacantes, 200);
     }
 }

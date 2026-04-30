@@ -122,8 +122,8 @@ INSERT INTO carreras (nombre_carrera) VALUES
 ('Licenciatura en Administración');
 
 -- 4. Egresados (Matrícula, Usuario, Carrera, etc.)
-INSERT INTO egresados (cve_alumno, id_usuario, id_carrera, nombre, apellido_paterno, apellido_materno, especialidad) VALUES 
-('20240001', 1, 1, 'Juan', 'Pérez', 'Gómez', 'Desarrollo de Software');
+INSERT INTO egresados (cve_alumno, matricula, id_usuario, id_carrera, nombre, apellido_paterno, apellido_materno) VALUES 
+('20240001', 'MAT-20240001', 1, 1, 'Juan', 'Pérez', 'Gómez');
 
 -- 5. Empresas (Usuario, DENUE, Razón Social)
 INSERT INTO empresas (id_usuario, id_denue, razon_social) VALUES 
