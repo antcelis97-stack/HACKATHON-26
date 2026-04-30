@@ -26,8 +26,8 @@ export class AppComponent implements AfterViewInit {
   mapaUrlSeguro: SafeResourceUrl | null = null;
   rutaUrl: string = '';
 
-  // Theme Management
-  isLightTheme: boolean = false;
+  // Theme Management (Predeterminado: Light para diseño institucional)
+  isLightTheme: boolean = true;
   isSidebarOpen: boolean = false;
 
   // Profile Management
@@ -59,12 +59,15 @@ export class AppComponent implements AfterViewInit {
     const savedSurvey = localStorage.getItem('hasCompletedSurvey');
     if (savedSurvey) this.hasCompletedSurvey = savedSurvey === 'true';
 
+    // Forzar modo claro institucional por defecto en esta actualización
     const savedTheme = localStorage.getItem('isLightTheme');
     if (savedTheme) {
       this.isLightTheme = JSON.parse(savedTheme);
-      this.applyTheme();
+    } else {
+      this.isLightTheme = true; // Por defecto siempre claro
     }
-    this.selectedVacante = this.vacantes[0]; // Por defecto la primera
+    this.applyTheme();
+    this.selectedVacante = this.vacantes[0]; 
   }
 
   onPhotoSelected(event: any) {
@@ -186,9 +189,11 @@ export class AppComponent implements AfterViewInit {
   }
 
   private applyTheme() {
-    if (this.isLightTheme) {
-      document.body.parentElement?.classList.add('light-theme');
+    if (!this.isLightTheme) {
+      document.body.parentElement?.classList.add('dark-theme');
+      document.body.parentElement?.classList.remove('light-theme');
     } else {
+      document.body.parentElement?.classList.remove('dark-theme');
       document.body.parentElement?.classList.remove('light-theme');
     }
   }
