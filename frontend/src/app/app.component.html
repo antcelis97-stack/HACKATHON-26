@@ -209,62 +209,13 @@
               class="btn"
               [class.btn-accent]="!hasCompletedSurvey"
               [class.btn-outline]="hasCompletedSurvey"
+              [disabled]="hasCompletedSurvey"
               (click)="completeSurvey()"
             >
               <i class="bi" [class.bi-clipboard-check]="!hasCompletedSurvey" [class.bi-check-all]="hasCompletedSurvey"></i>
-              {{ hasCompletedSurvey ? 'Ver Evaluación Cuantitativa' : 'Realizar Evaluación' }}
+              {{ hasCompletedSurvey ? 'Evaluación Completada' : 'Realizar Evaluación' }}
             </button>
             <span class="cv-nombre-guardado" *ngIf="cvNombreArchivo">CV: {{ cvNombreArchivo }}</span>
-          </div>
-        </div>
-
-        <div class="glass-panel profile-section survey-panel" *ngIf="surveyOpen">
-          <div class="card-header">
-            <h4><i class="bi bi-ui-checks-grid"></i> Método de Evaluación (Test cuantitativo)</h4>
-            <button type="button" class="btn btn-outline small" (click)="cancelSurvey()">
-              <i class="bi bi-x-circle"></i> Cancelar
-            </button>
-          </div>
-          <div class="card-body">
-            <div class="survey-career-switch">
-              <button type="button" class="btn small" [class.btn-primary]="selectedCareerId === 'tic'" [class.btn-outline]="selectedCareerId !== 'tic'" (click)="selectCareer('tic')">
-                Ingeniería en TIC
-              </button>
-              <button type="button" class="btn small" [class.btn-primary]="selectedCareerId === 'agrobiotec'" [class.btn-outline]="selectedCareerId !== 'agrobiotec'" (click)="selectCareer('agrobiotec')">
-                Ingeniería en Agrobiotecnología
-              </button>
-            </div>
-
-            <div class="survey-sections">
-              <div class="survey-section" *ngFor="let section of getCurrentSections()">
-                <h5>{{ section.title }}</h5>
-                <p class="survey-section-desc">{{ section.description }}</p>
-
-                <div class="survey-question" *ngFor="let question of section.questions">
-                  <p class="survey-question-title">
-                    <strong>{{ question.dimension }}:</strong> {{ question.text }}
-                  </p>
-                  <div class="survey-options">
-                    <button
-                      type="button"
-                      class="btn btn-outline small survey-option-btn"
-                      *ngFor="let option of question.options"
-                      [class.survey-option-active]="getAnswer(question.id) === option.points"
-                      (click)="answerQuestion(question, option)"
-                    >
-                      {{ option.text }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="survey-actions">
-              <button type="button" class="btn btn-primary" [disabled]="!canSubmitSurvey()" (click)="submitSurvey()">
-                <i class="bi bi-check2-square"></i> Enviar evaluación
-              </button>
-              <span class="survey-hint">Debes responder todas las preguntas para calcular los puntajes.</span>
-            </div>
           </div>
         </div>
 
@@ -276,15 +227,37 @@
               </div>
               <div class="card-body">
                 <div class="evaluation-list">
-                  <div class="eval-item" *ngFor="let item of getEvaluationItems()">
+                  <div class="eval-item">
                     <div class="eval-header">
-                      <span class="eval-title">{{ item.title }}</span>
-                      <span class="eval-score">{{ item.score }}/100</span>
+                      <span class="eval-title">Pruebas Psicométricas</span>
+                      <span class="eval-score">85/100</span>
                     </div>
-                    <div class="progress-bar">
-                      <div class="progress-fill" [style.width.%]="item.score" [style.background]="item.color"></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 85%; background: var(--primary-500);"></div></div>
+                    <p class="eval-desc">Alto desempeño bajo presión y excelente trabajo en equipo.</p>
+                  </div>
+                  <div class="eval-item">
+                    <div class="eval-header">
+                      <span class="eval-title">Pruebas Cognitivas</span>
+                      <span class="eval-score">78/100</span>
                     </div>
-                    <p class="eval-desc">{{ item.desc }}</p>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 78%; background: var(--secondary);"></div></div>
+                    <p class="eval-desc">Razonamiento lógico-verbal avanzado. Agilidad mental promedio.</p>
+                  </div>
+                  <div class="eval-item">
+                    <div class="eval-header">
+                      <span class="eval-title">Pruebas Técnicas</span>
+                      <span class="eval-score">95/100</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 95%; background: var(--accent);"></div></div>
+                    <p class="eval-desc">Validación de conocimientos en Desarrollo Web (Angular, Postgres).</p>
+                  </div>
+                  <div class="eval-item">
+                    <div class="eval-header">
+                      <span class="eval-title">Pruebas Proyectivas</span>
+                      <span class="eval-score">88/100</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 88%; background: var(--utc-brand);"></div></div>
+                    <p class="eval-desc">Estabilidad emocional robusta. Perfil de liderazgo identificado.</p>
                   </div>
                 </div>
               </div>
@@ -307,12 +280,10 @@
               </div>
               <div class="card-body">
                 <p class="summary-text">
-                  {{ getSurveySummaryText() }}
+                  La candidata presenta un <strong>perfil técnico sobresaliente</strong> y fuertes habilidades interpersonales. Su resultado en las pruebas proyectivas indica un alto potencial para posiciones de liderazgo técnico.
                 </p>
                 <div style="margin-top: 1rem;">
-                  <span class="badge" [class.badge-success]="isRecommendedCandidate()" [class.badge-primary]="!isRecommendedCandidate()">
-                    {{ isRecommendedCandidate() ? 'Recomendada para contratación' : 'Requiere plan de mejora' }}
-                  </span>
+                  <span class="badge badge-success">Recomendada para contratación</span>
                 </div>
               </div>
             </div>
