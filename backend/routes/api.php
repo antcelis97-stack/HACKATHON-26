@@ -50,6 +50,7 @@ $evaluacion = new EvaluacionController();
 $match = new MatchController();
 $reporte = new ReporteController();
 $drive = new GoogleDriveController();
+$grafica = new GraficaController();
 
 // =============================================================================
 // RUTAS PÚBLICAS
@@ -130,6 +131,12 @@ Flight::route('GET /api/v1/reportes/institucional/monitoreo', function() use ($r
 Flight::route('GET /api/v1/reportes/radar/@usuarioId', function($usuarioId) use ($reporte) {
     if (!authMiddleware()) return;
     $reporte->getRadarCompetencias($usuarioId);
+});
+
+// --- MÓDULO GRÁFICAS ---
+Flight::route('GET /api/v1/graficas/radar/@usuarioId', function($usuarioId) use ($grafica) {
+    if (!authMiddleware()) return;
+    $grafica->generateSkillGraph($usuarioId);
 });
 
 // --- OTROS MÓDULOS ---
