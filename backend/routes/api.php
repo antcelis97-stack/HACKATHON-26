@@ -74,6 +74,16 @@ Flight::route('GET /api/egresados/vacantes', [$egresado, 'searchVacantes']);
 // =============================================================================
 
 // --- MÓDULO EGRESADO ---
+Flight::get('/api/egresados/:usuarioId', function($usuarioId) use ($egresado) {
+    if (!authMiddleware()) return;
+    $egresado->getProfile($usuarioId);
+});
+
+Flight::route('POST /api/egresados/update-profile', function() use ($egresado) {
+    if (!authMiddleware()) return;
+    $egresado->updateProfile();
+});
+
 Flight::route('PUT /api/egresados/perfil', function() use ($egresado) {
     if (!authMiddleware()) return;
     $egresado->updateProfile();
