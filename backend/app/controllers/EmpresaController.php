@@ -86,26 +86,45 @@ class EmpresaController extends BaseController {
         }
     }
 
-    public function createVacante() {
+    /**
+     * POST /api/v1/empresas/vacantes
+     * Crear una nueva vacante con perfiles idóneos (benchmarks)
+     */
+    public function crearVacante() {
         $data = $this->getInput();
         
-        if (!isset($data['empresa_id'], $data['titulo'], $data['req_psicometricos'], $data['req_tecnicos'])) {
-            return Flight::json(['error' => 'Faltan datos obligatorios para la vacante'], 400);
+        // Validación de campos obligatorios
+        if (!isset($data['id_empresa'], $data['titulo_puesto'])) {
+            return Flight::json(['error' => 'ID de empresa y título del puesto son requeridos'], 400);
         }
 
-        $stmt = $this->db->prepare("INSERT INTO vacantes (empresa_id, titulo, perfil_idoneo, req_psicometricos, req_tecnicos, estatus) VALUES (?, ?, ?, ?, ?, 'activa')");
-        
-        // perfil_idoneo se guarda como JSON (ej. habilidades blandas)
-        if ($stmt->execute([
-            $data['empresa_id'], 
-            $data['titulo'], 
-            json_encode($data['perfil_idoneo'] ?? []), 
-            $data['req_psicometricos'], 
-            $data['req_tecnicos']
-        ])) {
-            return Flight::json(['message' => 'Vacante publicada exitosamente'], 201);
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO vacantes (
+                    id_empresa, 
+                    titulo_puesto, 
+                    descripcion, 
+                    min_psicometrico, 
+                    min_cognitivo, 
+                    min_tecnico, 
+                    min_proyectivo
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            
+            $stmt->execute([
+                $data['id_empresa'], 
+                $data['titulo_puesto'], 
+                $data['descripcion'] ?? null,
+                $data['min_psicometrico'] ?? 0, 
+                $data['min_cognitivo'] ?? 0, 
+                $data['min_tecnico'] ?? 0, 
+                $data['min_proyectivo'] ?? 0
+            ]);
+
+            return Flight::json(['mensaje' => 'Vacante publicada exitosamente con su perfil idóneo'], 201);
+
+        } catch (\Exception $e) {
+            return Flight::json(['error' => 'Error al publicar la vacante', 'detalle' => $e->getMessage()], 500);
         }
-        
-        return Flight::json(['error' => 'Error al publicar la vacante'], 500);
     }
 }
