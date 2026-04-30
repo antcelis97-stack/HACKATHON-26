@@ -1,42 +1,84 @@
-<div class="app-layout">
+<ng-container *ngIf="isAuthenticated; else loginView">
+<div class="app-layout" [class.sidebar-open]="isSidebarOpen">
+  <header class="mobile-header">
+    <div class="mobile-logo">
+      <img src="assets/UTClogin.jpg" alt="Logo" style="height: 32px; border-radius: 4px;">
+      <span>VinculaUT</span>
+    </div>
+    <div class="mobile-actions">
+      <button class="icon-btn" (click)="toggleTheme()">
+        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
+      </button>
+      <button class="icon-btn" (click)="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
   <!-- Sidebar Navigation -->
-  <aside class="sidebar glass-panel">
-    <div class="sidebar-header">
-      <div class="logo-box">
-        <i class="bi bi-mortarboard-fill text-gradient-primary"></i>
-      </div>
-      <div>
-        <h2 class="text-gradient">VinculaUT</h2>
-        <span class="badge badge-primary">Bolsa de Trabajo</span>
-      </div>
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-top-actions">
+      <button class="btn btn-theme-toggle" (click)="toggleTheme()">
+        <i class="bi" [class.bi-sun]="!isLightTheme" [class.bi-moon-stars]="isLightTheme"></i>
+        <span>{{ isLightTheme ? 'Modo Oscuro' : 'Modo Claro' }}</span>
+      </button>
+      <button class="btn btn-outline small" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Salir
+      </button>
+      <button class="mobile-close-btn" (click)="toggleSidebar()">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
 
     <nav class="sidebar-nav">
-      <!-- We can simulate tabs here since it's a prototype -->
-      <a href="#" class="nav-item active">
+      <a class="nav-item" *ngIf="canAccessView('dashboard')" [class.active]="currentView === 'dashboard'" (click)="switchView('dashboard')">
         <i class="bi bi-grid-1x2-fill"></i>
         <span>Dashboard Institucional</span>
       </a>
-      <a href="#" class="nav-item">
+      <a class="nav-item" *ngIf="canAccessView('profile')" [class.active]="currentView === 'profile'" (click)="switchView('profile')">
         <i class="bi bi-person-badge"></i>
         <span>Perfil Egresado</span>
       </a>
-      <a href="#" class="nav-item">
+      <a class="nav-item" *ngIf="canAccessView('empresas')" [class.active]="currentView === 'empresas'" (click)="switchView('empresas')">
         <i class="bi bi-buildings"></i>
         <span>Sector Empresarial</span>
       </a>
-      <a href="#" class="nav-item">
-        <i class="bi bi-clipboard2-data"></i>
-        <span>Analítica y Reportes</span>
-      </a>
+      <div class="nav-analitica-group" *ngIf="canAccessView('analitica')">
+        <button type="button" class="nav-item nav-analitica-parent" [class.active]="currentView === 'analitica'"
+          (click)="toggleAnaliticaReportesMenu($event)">
+          <i class="bi bi-clipboard2-data"></i>
+          <span class="nav-analitica-parent-text">Analítica y Reportes</span>
+          <i class="bi nav-analitica-chevron" [class.bi-chevron-down]="!reportesMenuOpen" [class.bi-chevron-up]="reportesMenuOpen"></i>
+        </button>
+        <div class="nav-reportes-submenu" *ngIf="reportesMenuOpen" (click)="$event.stopPropagation()">
+          <button type="button" class="nav-subitem" [class.nav-subitem-active]="currentView === 'analitica' && analiticaPanelId === 'resumen'"
+            (click)="seleccionarReporteDesdeSidebar('resumen')">
+            <i class="bi bi-speedometer2"></i><span>Resumen (gráficas)</span>
+          </button>
+          <button type="button" class="nav-subitem" [class.nav-subitem-active]="currentView === 'analitica' && analiticaPanelId === 'egresados_carrera'"
+            (click)="seleccionarReporteDesdeSidebar('egresados_carrera')">
+            <i class="bi bi-mortarboard"></i><span>Egresados por carrera</span>
+          </button>
+          <button type="button" class="nav-subitem" [class.nav-subitem-active]="currentView === 'analitica' && analiticaPanelId === 'postulaciones_prueba'"
+            (click)="seleccionarReporteDesdeSidebar('postulaciones_prueba')">
+            <i class="bi bi-inboxes"></i><span>Postulaciones (prueba)</span>
+          </button>
+          <button type="button" class="nav-subitem" [class.nav-subitem-active]="currentView === 'analitica' && analiticaPanelId === 'vacantes_prueba'"
+            (click)="seleccionarReporteDesdeSidebar('vacantes_prueba')">
+            <i class="bi bi-building-check"></i><span>Vacantes por empresa (prueba)</span>
+          </button>
+        </div>
+      </div>
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile">
-        <div class="avatar">AD</div>
-        <div class="user-info">
-          <h5>UT de la Costa</h5>
-          <span>Gestión Nacional</span>
+      <div class="user-profile" style="flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding-top: 1rem;">
+        <img src="assets/UTClogin.jpg?v=3" alt="Logo Perfil" style="width: 70px; height: 70px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        <div class="user-info" style="margin-left: 0;">
+          <h5 style="margin-bottom: 0.2rem; font-size: 1.1rem;">{{ currentUsername | titlecase }}</h5>
+          <span style="font-size: 0.85rem;">{{ getRoleLabel() }}</span>
         </div>
       </div>
     </div>
@@ -44,133 +86,563 @@
 
   <!-- Main Content Area -->
   <main class="main-content">
-    <header class="topbar glass-panel">
-      <div class="search-bar">
-        <i class="bi bi-search"></i>
-        <input type="text" placeholder="Buscar vacantes, egresados o empresas...">
-      </div>
-      <div class="topbar-actions">
-        <button class="btn btn-outline icon-btn"><i class="bi bi-bell"></i></button>
-        <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nueva Vacante</button>
-      </div>
-    </header>
-
+    <!-- VIEWS CONTAINER -->
     <div class="dashboard-content">
-      <!-- KPIs -->
-      <div class="kpi-grid">
-        <div class="kpi-card glass-panel">
-          <div class="kpi-icon"><i class="bi bi-briefcase"></i></div>
-          <div class="kpi-info">
-            <span class="kpi-label">Vacantes Activas</span>
-            <h3 class="kpi-value">124 <span class="trend up"><i class="bi bi-arrow-up-short"></i> 12%</span></h3>
-          </div>
-        </div>
-        <div class="kpi-card glass-panel">
-          <div class="kpi-icon success"><i class="bi bi-check-circle"></i></div>
-          <div class="kpi-info">
-            <span class="kpi-label">Inserción Laboral</span>
-            <h3 class="kpi-value">78% <span class="trend up"><i class="bi bi-arrow-up-short"></i> 5%</span></h3>
-          </div>
-        </div>
-        <div class="kpi-card glass-panel">
-          <div class="kpi-icon warning"><i class="bi bi-building"></i></div>
-          <div class="kpi-info">
-            <span class="kpi-label">Empresas (Convenio)</span>
-            <h3 class="kpi-value">45 <span class="trend neutral">-</span></h3>
-          </div>
-        </div>
-        <div class="kpi-card glass-panel">
-          <div class="kpi-icon info"><i class="bi bi-people"></i></div>
-          <div class="kpi-info">
-            <span class="kpi-label">Egresados Registrados</span>
-            <h3 class="kpi-value">850 <span class="trend up"><i class="bi bi-arrow-up-short"></i> 24%</span></h3>
-          </div>
-        </div>
-      </div>
 
-      <!-- Main Dashboards Section -->
-      <div class="charts-grid">
-        <!-- Chart 1: Histograma de Pruebas -->
-        <div class="chart-card glass-panel">
-          <div class="card-header">
-            <h4><i class="bi bi-bar-chart-fill"></i> Desempeño Promedio de Egresados</h4>
-            <button class="btn btn-outline icon-btn"><i class="bi bi-three-dots"></i></button>
+      <!-- ========================================== -->
+      <!-- VIEW: DASHBOARD INSTITUCIONAL              -->
+      <!-- ========================================== -->
+      <ng-container *ngIf="currentView === 'dashboard'">
+        <div class="kpi-grid">
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon"><i class="bi bi-briefcase"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Vacantes Activas</span>
+              <h3 class="kpi-value">124 <span class="trend up"><i class="bi bi-arrow-up-short"></i> 12%</span></h3>
+            </div>
           </div>
-          <div class="card-body chart-container">
-            <canvas id="histogramChart"></canvas>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon success"><i class="bi bi-check-circle"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Inserción Laboral</span>
+              <h3 class="kpi-value">78% <span class="trend up"><i class="bi bi-arrow-up-short"></i> 5%</span></h3>
+            </div>
+          </div>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon warning"><i class="bi bi-building"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Empresas (Convenio)</span>
+              <h3 class="kpi-value">45 <span class="trend neutral">-</span></h3>
+            </div>
+          </div>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-icon info"><i class="bi bi-people"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Egresados Registrados</span>
+              <h3 class="kpi-value">850 <span class="trend up"><i class="bi bi-arrow-up-short"></i> 24%</span></h3>
+            </div>
           </div>
         </div>
 
-        <!-- Chart 2: Spider Chart Competencias -->
-        <div class="chart-card glass-panel">
+        <div class="table-section glass-panel">
           <div class="card-header">
-            <h4><i class="bi bi-radar"></i> Radar de Competencias (Real vs Ideal)</h4>
-            <button class="btn btn-outline icon-btn"><i class="bi bi-three-dots"></i></button>
+              <h4><i class="bi bi-person-lines-fill"></i> Candidatos Idóneos Recientes</h4>
+              <button class="btn btn-outline small">Ver todos</button>
           </div>
-          <div class="card-body chart-container">
-            <canvas id="radarChart"></canvas>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Egresado</th>
+                  <th>Carrera</th>
+                  <th>Afinidad (Vacante)</th>
+                  <th>Pruebas Completadas</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="table-user">
+                      <div class="avatar small">MA</div>
+                      <span>María Armenta</span>
+                    </div>
+                  </td>
+                  <td>Ing. en Desarrollo y Gestión de Software</td>
+                  <td><span class="badge badge-success">92% Match</span></td>
+                  <td>4/4 (100%)</td>
+                  <td><button class="btn btn-outline small" (click)="switchView('profile')">Ver Perfil PDF</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="table-user">
+                      <div class="avatar small">CJ</div>
+                      <span>Carlos Jiménez</span>
+                    </div>
+                  </td>
+                  <td>Lic. en Innovación de Negocios</td>
+                  <td><span class="badge badge-primary">85% Match</span></td>
+                  <td>4/4 (100%)</td>
+                  <td><button class="btn btn-outline small" (click)="switchView('profile')">Ver Perfil PDF</button></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
-      
-      <!-- List of candidates -->
-      <div class="table-section glass-panel">
-        <div class="card-header">
-            <h4><i class="bi bi-person-lines-fill"></i> Candidatos Idóneos Recientes</h4>
-            <button class="btn btn-outline small">Ver todos</button>
+      </ng-container>
+
+      <!-- ========================================== -->
+      <!-- VIEW: PERFIL EGRESADO                      -->
+      <!-- ========================================== -->
+      <ng-container *ngIf="currentView === 'profile'">
+        <div class="profile-header glass-panel">
+          <div class="profile-main-info">
+            <div class="profile-photo" (click)="photoInput.click()" style="cursor: pointer; position: relative;" title="Click para cambiar foto">
+              <img [src]="profilePhotoUrl || 'https://ui-avatars.com/api/?name=Maria+Armenta&background=2563eb&color=fff&size=120'" alt="Foto Egresado">
+              <div class="photo-overlay">
+                <i class="bi bi-camera-fill"></i>
+                <span>Cambiar</span>
+              </div>
+              <input type="file" #photoInput style="display: none;" (change)="onPhotoSelected($event)" accept="image/*">
+            </div>
+            <div class="profile-details">
+              <div class="profile-title">
+                <h2>María Armenta</h2>
+                <span class="badge badge-success">Perfil Idóneo Completado</span>
+              </div>
+              <p class="career-text"><i class="bi bi-mortarboard"></i> Ing. en Desarrollo y Gestión de Software</p>
+              <div class="profile-tags">
+                <span class="tag"><i class="bi bi-geo-alt"></i> Tepic, Nayarit</span>
+                <span class="tag"><i class="bi bi-envelope"></i> m.armenta&#64;utc.edu.mx</span>
+                <span class="tag"><i class="bi bi-telephone"></i> +52 311 123 4567</span>
+              </div>
+            </div>
+          </div>
+          <div class="profile-actions profile-actions-wrap">
+            <input type="file" #cvInput style="display: none;" (change)="onCvSelected($event)" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            <button type="button" class="btn btn-primary" (click)="descargarPDF()"><i class="bi bi-file-earmark-pdf"></i> Exportar Reporte</button>
+            <button type="button" class="btn btn-green" (click)="cvInput.click()" title="PDF, Word">
+              <i class="bi bi-cloud-upload"></i> Subir CV / Actualizar CV
+            </button>
+            <button
+              type="button"
+              class="btn"
+              [class.btn-accent]="!hasCompletedSurvey"
+              [class.btn-outline]="hasCompletedSurvey"
+              (click)="completeSurvey()"
+            >
+              <i class="bi" [class.bi-clipboard-check]="!hasCompletedSurvey" [class.bi-check-all]="hasCompletedSurvey"></i>
+              {{ hasCompletedSurvey ? 'Ver Evaluación Cuantitativa' : 'Realizar Evaluación' }}
+            </button>
+            <span class="cv-nombre-guardado" *ngIf="cvNombreArchivo">CV: {{ cvNombreArchivo }}</span>
+          </div>
         </div>
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Egresado</th>
-                <th>Carrera</th>
-                <th>Afinidad (Vacante)</th>
-                <th>Pruebas Completadas</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="table-user">
-                    <div class="avatar small">MA</div>
-                    <span>María Armenta</span>
+
+        <div class="glass-panel profile-section survey-panel" *ngIf="surveyOpen">
+          <div class="card-header">
+            <h4><i class="bi bi-ui-checks-grid"></i> Método de Evaluación (Test cuantitativo)</h4>
+            <button type="button" class="btn btn-outline small" (click)="cancelSurvey()">
+              <i class="bi bi-x-circle"></i> Cancelar
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="survey-career-switch">
+              <button type="button" class="btn small" [class.btn-primary]="selectedCareerId === 'tic'" [class.btn-outline]="selectedCareerId !== 'tic'" (click)="selectCareer('tic')">
+                Ingeniería en TIC
+              </button>
+              <button type="button" class="btn small" [class.btn-primary]="selectedCareerId === 'agrobiotec'" [class.btn-outline]="selectedCareerId !== 'agrobiotec'" (click)="selectCareer('agrobiotec')">
+                Ingeniería en Agrobiotecnología
+              </button>
+            </div>
+
+            <div class="survey-sections">
+              <div class="survey-section" *ngFor="let section of getCurrentSections()">
+                <h5>{{ section.title }}</h5>
+                <p class="survey-section-desc">{{ section.description }}</p>
+
+                <div class="survey-question" *ngFor="let question of section.questions">
+                  <p class="survey-question-title">
+                    <strong>{{ question.dimension }}:</strong> {{ question.text }}
+                  </p>
+                  <div class="survey-options">
+                    <button
+                      type="button"
+                      class="btn btn-outline small survey-option-btn"
+                      *ngFor="let option of question.options"
+                      [class.survey-option-active]="getAnswer(question.id) === option.points"
+                      (click)="answerQuestion(question, option)"
+                    >
+                      {{ option.text }}
+                    </button>
                   </div>
-                </td>
-                <td>Ing. en Desarrollo y Gestión de Software</td>
-                <td><span class="badge badge-success">92% Match</span></td>
-                <td>4/4 (100%)</td>
-                <td><button class="btn btn-outline small">Ver Perfil PDF</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-user">
-                    <div class="avatar small">CJ</div>
-                    <span>Carlos Jiménez</span>
-                  </div>
-                </td>
-                <td>Lic. en Innovación de Negocios</td>
-                <td><span class="badge badge-primary">85% Match</span></td>
-                <td>4/4 (100%)</td>
-                <td><button class="btn btn-outline small">Ver Perfil PDF</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-user">
-                    <div class="avatar small">LG</div>
-                    <span>Laura Gómez</span>
-                  </div>
-                </td>
-                <td>Ing. en Logística</td>
-                <td><span class="badge badge-success">88% Match</span></td>
-                <td>4/4 (100%)</td>
-                <td><button class="btn btn-outline small">Ver Perfil PDF</button></td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="survey-actions">
+              <button type="button" class="btn btn-primary" [disabled]="!canSubmitSurvey()" (click)="submitSurvey()">
+                <i class="bi bi-check2-square"></i> Enviar evaluación
+              </button>
+              <span class="survey-hint">Debes responder todas las preguntas para calcular los puntajes.</span>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <div class="profile-grid">
+          <div class="profile-column left-col">
+            <div class="glass-panel profile-section">
+              <div class="card-header">
+                <h4><i class="bi bi-clipboard-data"></i> Resultados de Evaluaciones</h4>
+              </div>
+              <div class="card-body">
+                <div class="evaluation-list">
+                  <div class="eval-item" *ngFor="let item of getEvaluationItems()">
+                    <div class="eval-header">
+                      <span class="eval-title">{{ item.title }}</span>
+                      <span class="eval-score">{{ item.score }}/100</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" [style.width.%]="item.score" [style.background]="item.color"></div>
+                    </div>
+                    <p class="eval-desc">{{ item.desc }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-column right-col">
+            <div class="chart-card glass-panel">
+              <div class="card-header">
+                <h4><i class="bi bi-radar"></i> Radar de Competencias (Spider Chart)</h4>
+              </div>
+              <div class="card-body chart-container" style="height: 350px; position: relative;">
+                <canvas id="radarChartProfile"></canvas>
+              </div>
+            </div>
+
+            <div class="glass-panel profile-section" style="margin-top: 1.5rem;">
+              <div class="card-header">
+                <h4><i class="bi bi-lightning-charge"></i> Resumen de Idoneidad</h4>
+              </div>
+              <div class="card-body">
+                <p class="summary-text">
+                  {{ getSurveySummaryText() }}
+                </p>
+                <div style="margin-top: 1rem;">
+                  <span class="badge" [class.badge-success]="isRecommendedCandidate()" [class.badge-primary]="!isRecommendedCandidate()">
+                    {{ isRecommendedCandidate() ? 'Recomendada para contratación' : 'Requiere plan de mejora' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ========================================== -->
+      <!-- VIEW: SECTOR EMPRESARIAL                   -->
+      <!-- ========================================== -->
+      <ng-container *ngIf="currentView === 'empresas'">
+        <div class="profile-header glass-panel" style="align-items: center;">
+          <div>
+            <h2 class="text-gradient">Sector Empresarial</h2>
+            <p style="color: var(--text-muted);">Gestión de Empresas con Convenio e Integración INEGI DENUE</p>
+          </div>
+          <button class="btn btn-primary" (click)="registrarEmpresa()"><i class="bi bi-building-add"></i> Registrar Empresa</button>
+        </div>
+
+        <div class="glass-panel profile-section" style="margin-bottom: 1.5rem;">
+          <div class="card-header">
+            <h4><i class="bi bi-search"></i> Explorador Nacional de Empresas (INEGI DENUE)</h4>
+          </div>
+          <div class="card-body" style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 320px;">
+              <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
+                <input
+                  type="text"
+                  #keywordInput
+                  (keyup.enter)="buscarEmpresasINEGI(keywordInput.value)"
+                  placeholder="Ej. software, arquitectura..."
+                  style="flex: 1; border-radius: 12px; background: var(--bg-darker); border: 1px solid var(--surface-border); padding: 0.75rem 1rem; color: var(--text-main); outline: none;"
+                />
+                <button class="btn btn-primary" (click)="buscarEmpresasINEGI(keywordInput.value)" [disabled]="isSearchingInegi">
+                  <i class="bi bi-search" *ngIf="!isSearchingInegi"></i>
+                  {{ isSearchingInegi ? 'Buscando...' : 'Buscar' }}
+                </button>
+              </div>
+
+              <div *ngIf="inegiUsingMock" style="padding: 0.85rem 1rem; background: rgba(201, 162, 39, 0.12); border-left: 4px solid var(--accent); margin-bottom: 1rem; border-radius: 4px;">
+                <p style="color: var(--text-main); margin: 0; font-size: 0.9rem;">
+                  <i class="bi bi-info-circle"></i>
+                  <strong>Modo demostración:</strong> la respuesta no vino marcada como INEGI oficial (revisa token en .env del backend o el mensaje de error arriba).
+                </p>
+              </div>
+
+              <div *ngIf="inegiError" style="padding: 1rem; background: rgba(198, 40, 40, 0.08); border-left: 4px solid var(--danger); margin-bottom: 1rem; border-radius: 4px;">
+                <p style="color: var(--danger); margin: 0;"><i class="bi bi-exclamation-triangle"></i> {{ inegiError }}</p>
+              </div>
+
+              <div class="table-responsive" *ngIf="inegiResults.length > 0" style="max-height: 360px; overflow-y: auto; border-radius: 8px;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Empresa</th>
+                      <th>Tamaño</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let empresa of inegiResults" [style.background]="selectedEmpresa === empresa ? 'rgba(0, 61, 51, 0.08)' : 'transparent'">
+                      <td>
+                        <strong style="font-weight: 600;">{{ empresa.Nombre }}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="bi bi-geo-alt"></i> {{ empresa.Municipio }}, {{ empresa.Entidad }}</span>
+                      </td>
+                      <td><span class="badge badge-primary">{{ empresa.Estrato }}</span></td>
+                      <td>
+                        <button class="btn btn-outline small" (click)="verMapa(empresa)">
+                          <i class="bi bi-geo-alt-fill"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div *ngIf="inegiResults.length === 0 && !isSearchingInegi && !inegiError" style="text-align: center; color: var(--text-muted); padding: 2rem; border: 1px dashed var(--surface-border); border-radius: 12px; background: var(--bg-darker);">
+                <i class="bi bi-buildings" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                <p style="margin-top: 1rem;">Busca un sector o palabra clave para localizar empresas en el mapa.</p>
+              </div>
+            </div>
+
+            <div style="flex: 1; min-width: 320px; display: flex; flex-direction: column;">
+              <div class="glass-panel" style="border: 1px solid var(--utc-border-subtle); padding: 1rem; border-radius: var(--utc-radius-md); background: rgba(0, 61, 51, 0.03); flex: 1; display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.75rem;">
+                  <div style="flex: 1; padding-right: 0.5rem;">
+                    <h5 style="margin: 0; color: var(--text-light); font-size: 1.1rem;"><i class="bi bi-map-fill"></i> {{ selectedEmpresa?.Nombre }}</h5>
+                  </div>
+                  <button
+                    *ngIf="selectedEmpresa?.Nombre !== 'Tepic, Nayarit (Vista General)'"
+                    (click)="trazarRutaEnMapa()"
+                    class="btn btn-primary small"
+                    style="background-color: var(--secondary); border-color: var(--secondary); flex-shrink: 0;"
+                  >
+                    <i class="bi bi-sign-turn-right-fill"></i> Ver Ruta
+                  </button>
+                </div>
+
+                <div style="width: 100%; min-height: 350px; flex: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--surface-border);">
+                  <iframe *ngIf="mapaUrlSeguro" [src]="mapaUrlSeguro" width="100%" height="100%" style="border: 0;" loading="lazy"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-section glass-panel">
+          <div class="card-header">
+              <h4><i class="bi bi-briefcase-fill"></i> Directorio de Vacantes</h4>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Vacante</th>
+                  <th>Empresa</th>
+                  <th>Postulantes</th>
+                  <th>Estatus</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 600;">Desarrollador Full Stack</td>
+                  <td>TechSolutions Nayarit</td>
+                  <td>12</td>
+                  <td><span class="badge badge-success">Activa</span></td>
+                  <td><button class="btn btn-outline small">Gestionar</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Analista de Datos Jr.</td>
+                  <td>AgroIndustrias de la Costa</td>
+                  <td>8</td>
+                  <td><span class="badge badge-primary">En Revisión</span></td>
+                  <td><button class="btn btn-outline small">Gestionar</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Especialista en Redes</td>
+                  <td>TelecomPacífico</td>
+                  <td>0</td>
+                  <td><span class="badge badge-success">Activa</span></td>
+                  <td><button class="btn btn-outline small">Gestionar</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ========================================== -->
+      <!-- VIEW: ANALITICA Y REPORTES                 -->
+      <!-- ========================================== -->
+      <ng-container *ngIf="currentView === 'analitica'">
+        <div class="profile-header glass-panel">
+          <div>
+            <h2 class="text-gradient">Analítica y Reportes Estratégicos</h2>
+            <p style="color: var(--text-muted); margin-bottom: 0.25rem;">Tableros de control para la toma de decisiones institucionales</p>
+            <p class="analitica-panel-badge"><i class="bi bi-bookmark-fill"></i> {{ tituloAnaliticaPanelActual() }}</p>
+          </div>
+          <button class="btn btn-outline" (click)="descargarPDF()"><i class="bi bi-download"></i> Descargar PDF</button>
+        </div>
+
+        <ng-container *ngIf="analiticaPanelId === 'resumen'">
+          <div class="charts-grid">
+            <div class="chart-card glass-panel">
+              <div class="card-header">
+                <h4><i class="bi bi-bar-chart-steps"></i> Ranking de Competencias Demandadas</h4>
+              </div>
+              <div class="card-body chart-container">
+                <canvas id="skillsChart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card glass-panel">
+              <div class="card-header">
+                <h4><i class="bi bi-pie-chart-fill"></i> Estatus de Inserción Laboral</h4>
+              </div>
+              <div class="card-body chart-container">
+                <canvas id="placementChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-grid" style="margin-top: 1.5rem;">
+            <div class="kpi-card glass-panel">
+              <div class="kpi-icon info"><i class="bi bi-clock-history"></i></div>
+              <div class="kpi-info">
+                <span class="kpi-label">Tiempo Promedio Cobertura</span>
+                <h3 class="kpi-value">14 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">días</span></h3>
+              </div>
+            </div>
+            <div class="kpi-card glass-panel">
+              <div class="kpi-icon warning"><i class="bi bi-journal-check"></i></div>
+              <div class="kpi-info">
+                <span class="kpi-label">Convenios por Vencer</span>
+                <h3 class="kpi-value">3 <span style="font-size: 1rem; color: var(--text-muted); font-weight:normal;">empresas</span></h3>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Reporte: egresados por carrera -->
+        <div class="table-section glass-panel reporte-inst-panel" *ngIf="analiticaPanelId === 'egresados_carrera'" style="margin-top: 1.25rem;">
+          <div class="card-header">
+            <div>
+              <h4><i class="bi bi-mortarboard"></i> Egresados por carrera</h4>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                Intenta cargar desde PostgreSQL; si no hay datos o falla la conexión, se muestran filas de ejemplo.
+              </p>
+            </div>
+            <button type="button" class="btn btn-outline small" (click)="cargarReporteEgresadosPorCarrera()">
+              <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </button>
+          </div>
+          <div class="reporte-banner-prueba" *ngIf="reporteEgresadosCarreraUsaPrueba && !reporteEgresadosCarreraLoading">
+            <i class="bi bi-info-circle"></i> Mostrando <strong>datos de prueba</strong> (API vacía o no disponible).
+          </div>
+          <div class="table-responsive" style="padding: 0 1rem 1rem 1rem;">
+            <p *ngIf="reporteEgresadosCarreraLoading" style="color: var(--text-muted); text-align: center; padding: 1.5rem;">Cargando reporte...</p>
+            <table class="data-table" *ngIf="!reporteEgresadosCarreraLoading && reporteEgresadosCarreraFilas.length > 0">
+              <thead>
+                <tr>
+                  <th>Carrera</th>
+                  <th>Total egresados</th>
+                  <th>Con exámenes completos</th>
+                  <th>% Exámenes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of reporteEgresadosCarreraFilas">
+                  <td>{{ r.carrera }}</td>
+                  <td>{{ r.total_egresados }}</td>
+                  <td>{{ r.con_examenes_completos }}</td>
+                  <td>{{ porcentajeExamenesCarrera(r) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reporte de prueba: postulaciones -->
+        <div class="table-section glass-panel reporte-inst-panel" *ngIf="analiticaPanelId === 'postulaciones_prueba'" style="margin-top: 1.25rem;">
+          <div class="card-header">
+            <div>
+              <h4><i class="bi bi-inboxes"></i> Postulaciones por estatus</h4>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                Datos de prueba alineados al enum <code>estatus_postulacion</code> de la BD (conexión pendiente).
+              </p>
+            </div>
+          </div>
+          <div class="reporte-banner-prueba">
+            <i class="bi bi-flask"></i> Reporte de demostración — no proviene de la base de datos.
+          </div>
+          <div class="table-responsive" style="padding: 0 1rem 1rem 1rem;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Estatus</th>
+                  <th>Total postulaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of reportePruebaPostulaciones">
+                  <td>{{ formatEstatusPostulacion(p.estatus) | titlecase }}</td>
+                  <td>{{ p.total }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reporte de prueba: vacantes -->
+        <div class="table-section glass-panel reporte-inst-panel" *ngIf="analiticaPanelId === 'vacantes_prueba'" style="margin-top: 1.25rem;">
+          <div class="card-header">
+            <div>
+              <h4><i class="bi bi-building-check"></i> Vacantes por empresa</h4>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                Datos de prueba: vacantes activas y volumen de postulaciones simulado.
+              </p>
+            </div>
+          </div>
+          <div class="reporte-banner-prueba">
+            <i class="bi bi-flask"></i> Reporte de demostración — no proviene de la base de datos.
+          </div>
+          <div class="table-responsive" style="padding: 0 1rem 1rem 1rem;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Vacantes activas</th>
+                  <th>Postulaciones (totales)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let v of reportePruebaVacantes">
+                  <td>{{ v.empresa }}</td>
+                  <td>{{ v.vacantes_activas }}</td>
+                  <td>{{ v.postulaciones_totales }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-container>
+
     </div>
   </main>
 </div>
+</ng-container>
+
+<ng-template #loginView>
+  <div class="login-layout">
+    <div class="login-card glass-panel">
+      <img src="assets/UTClogin.jpg" alt="UT Logo" class="login-logo">
+      <h2 class="text-gradient">Acceso a VinculaUT</h2>
+      <p class="login-help">Ingresa con uno de los 3 perfiles para ver permisos por rol.</p>
+
+      <form class="login-form" (submit)="$event.preventDefault(); login(user.value, pass.value)">
+        <input #user type="text" placeholder="Usuario" autocomplete="username">
+        <input #pass type="password" placeholder="Contraseña" autocomplete="current-password">
+        <button class="btn btn-primary" type="submit">Iniciar sesión</button>
+      </form>
+
+      <div class="login-credentials">
+        <span><strong>Egresado:</strong> egresado / 1234</span>
+        <span><strong>Empresa:</strong> empresa / 1234</span>
+        <span><strong>Admin:</strong> admin / 1234</span>
+      </div>
+
+      <p class="login-error" *ngIf="loginError">{{ loginError }}</p>
+    </div>
+  </div>
+</ng-template>
